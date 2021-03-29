@@ -1,7 +1,7 @@
 # Проект «Киноман»
 
 * Студент: [Злата Филоненко](https://up.htmlacademy.ru/ecmascript/14/user/497629).
-* Наставник: `Неизвестно`.
+* Наставник: [Сергей Рожков](https://up.htmlacademy.ru/ecmascript/14/user/1069033).
 
 ---
 
