@@ -12,7 +12,7 @@ const EXTRA_FILM_COUNT = 2;
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
-}
+};
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
@@ -36,7 +36,7 @@ for (let i = 0; i < FILM_COUNT; i++) {
   render(mainFilmsListContainerElement, createCardTemplate(), 'beforeend');
 }
 
-extraFilmsListContainerElements.forEach(element => {
+extraFilmsListContainerElements.forEach((element) => {
   for (let i = 0; i < EXTRA_FILM_COUNT; i++) {
     render(element, createCardTemplate(), 'beforeend');
   }
