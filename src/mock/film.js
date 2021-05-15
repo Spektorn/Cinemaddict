@@ -5,7 +5,6 @@ import {getRandomFloat} from '../utilities.js';
 import {getRandomBoolean} from '../utilities.js';
 import {getRandomArrayValue} from '../utilities.js';
 import {getSeveralRandomArrayValues} from '../utilities.js';
-import { generateFilter } from './filter.js';
 
 //* Mock-данные
 const posters = [
@@ -89,7 +88,7 @@ const generateDate = (type) => {
     },
   };
 
-  let date = dateType[type]['isInPast'] ? dayjs().add(-PAST_YEAR_GAP, 'year') : dayjs();
+  const date = dateType[type]['isInPast'] ? dayjs().add(-PAST_YEAR_GAP, 'year') : dayjs();
 
   const daysGap = getRandomInteger(-(dateType[type]['maxDaysGap']), dateType[type]['maxDaysGap']);
 
@@ -135,7 +134,7 @@ export const generateFilm = () => {
     actors: getSeveralRandomArrayValues(people),
     isInWatchlist: getRandomBoolean(),
     isWatched: getRandomBoolean(),
-    isFavourite: getRandomBoolean(),
+    isFavorite: getRandomBoolean(),
   };
 };
 
@@ -145,12 +144,12 @@ export const generateFilmData = () => {
   const MAX_COMMENT_QUANTITY = 5;
 
   return new Array(generateFilm(),
-  new Array(getRandomInteger(MIN_COMMENT_QUANTITY, MAX_COMMENT_QUANTITY)).fill().map(() => generateComment()));
+    new Array(getRandomInteger(MIN_COMMENT_QUANTITY, MAX_COMMENT_QUANTITY)).fill().map(() => generateComment()));
 };
 
 //* Генерация коллекции связанных фильмов и комментариев
 export const generateFilmsData = (filmsQuantity) => {
-  let filmsData = new Map;
+  const filmsData = new Map;
 
   for (let i = 0; i < filmsQuantity; i++) {
     filmsData.set(...(generateFilmData()));

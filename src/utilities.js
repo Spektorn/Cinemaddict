@@ -17,6 +17,11 @@ export const getRandomArrayValue = (array) => {
   return array[getRandomInteger(0, array.length - 1)];
 };
 
-export const getSeveralRandomArrayValues = function (array, minLength = 1, maxLength = array.length) {
+export const getSeveralRandomArrayValues = (array, minLength = 1, maxLength = array.length) => {
   return new Array(getRandomInteger(minLength, maxLength)).fill().map(() => getRandomArrayValue(array));
+};
+
+export const getSlicedDataFromMap = (map, startIndex, endIndex) => {
+  return Array.from(map.keys()).slice(startIndex, endIndex)
+    .reduce((slicedMap, key) => slicedMap.set(key, map.get(key)), new Map);
 };

@@ -1,9 +1,9 @@
 export const createCardTemplate = (filmData, commentsData) => {
-  const {poster, title, description, rating, releaseDate, runningTime, genres, isInWatchlist, isWatched, isFavourite} = filmData;
+  const {poster, title, description, rating, releaseDate, runningTime, genres, isInWatchlist, isWatched, isFavorite} = filmData;
 
   const renderDescription = () => {
     const MAX_DESCRIPTION_LENGTH = 140;
-    let changedDescription = description.slice().join(' ');
+    const changedDescription = description.slice().join(' ');
 
     if (changedDescription.length > MAX_DESCRIPTION_LENGTH) {
       return `${changedDescription.slice(0, MAX_DESCRIPTION_LENGTH - 1)}…`;
@@ -30,7 +30,7 @@ export const createCardTemplate = (filmData, commentsData) => {
             <div class="film-card__controls">
               <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist ${renderActiveClass(isInWatchlist)}" type="button">Add to watchlist</button>
               <button class="film-card__controls-item button film-card__controls-item--mark-as-watched ${renderActiveClass(isWatched)}" type="button">Mark as watched</button>
-              <button class="film-card__controls-item button film-card__controls-item--favorite ${renderActiveClass(isFavourite)}" type="button">Mark as favorite</button>
+              <button class="film-card__controls-item button film-card__controls-item--favorite ${renderActiveClass(isFavorite)}" type="button">Mark as favorite</button>
             </div>
           </article>`;
 };

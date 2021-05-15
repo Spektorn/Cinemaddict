@@ -1,9 +1,9 @@
 export const createDetailedCardTemplate = (filmData, commentsData) => {
   const {poster, title, originalTitle, description, rating, ageRating, country,
-    releaseDate, runningTime, genres, director, scriptwriters, actors, isInWatchlist, isWatched, isFavourite} = filmData;
+    releaseDate, runningTime, genres, director, scriptwriters, actors, isInWatchlist, isWatched, isFavorite} = filmData;
 
   const renderGenres = () => {
-    let genresTitle = genres.length > 1 ? 'Genres' : 'Genre';
+    const genresTitle = genres.length > 1 ? 'Genres' : 'Genre';
     let genresTable = '';
 
     genres.forEach((element) => {
@@ -15,7 +15,7 @@ export const createDetailedCardTemplate = (filmData, commentsData) => {
               <td class="film-details__cell">
                 ${genresTable}
               </td>
-            </tr>`
+            </tr>`;
   };
 
   const renderCheckedState = (flag) => {
@@ -42,13 +42,13 @@ export const createDetailedCardTemplate = (filmData, commentsData) => {
                         <button class="film-details__comment-delete">Delete</button>
                       </p>
                     </div>
-                  </li>`
+                  </li>`;
     });
 
     return `<ul class="film-details__comments-list">
               ${comments}
-            </ul>`
-  }
+            </ul>`;
+  };
 
   return `<section class="film-details">
             <form class="film-details__inner" action="" method="get">
@@ -114,7 +114,7 @@ export const createDetailedCardTemplate = (filmData, commentsData) => {
                   <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched" ${renderCheckedState(isWatched)}>
                   <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
 
-                  <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite" ${renderCheckedState(isFavourite)}>
+                  <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite" ${renderCheckedState(isFavorite)}>
                   <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
                 </section>
               </div>
