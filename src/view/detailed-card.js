@@ -1,54 +1,56 @@
-export const createDetailedCardTemplate = (filmData, commentsData) => {
+import {createElement} from '../utilities.js';
+
+const renderGenres = (genres) => {
+  const genresTitle = genres.length > 1 ? 'Genres' : 'Genre';
+  let genresTable = '';
+
+  genres.forEach((element) => {
+    genresTable += `<span class="film-details__genre">${element}</span>`;
+  });
+
+  return `<tr class="film-details__row">
+            <td class="film-details__term">${genresTitle}</td>
+            <td class="film-details__cell">
+              ${genresTable}
+            </td>
+          </tr>`;
+};
+
+const renderCheckedState = (flag) => {
+  return flag ? 'checked' : '';
+};
+
+const renderComments = (commentsData) => {
+  if (!commentsData) {
+    return;
+  }
+
+  let comments = '';
+
+  commentsData.forEach((element) => {
+    comments += `<li class="film-details__comment">
+                  <span class="film-details__comment-emoji">
+                    <img src="./images/emoji/${element.emotion}.png" width="55" height="55" alt="emoji-${element.emotion}">
+                  </span>
+                  <div>
+                    <p class="film-details__comment-text">${element.text.join(' ')}</p>
+                    <p class="film-details__comment-info">
+                      <span class="film-details__comment-author">${element.author}</span>
+                      <span class="film-details__comment-day">${element.date.format('YYYY/MM/DD HH:mm')}</span>
+                      <button class="film-details__comment-delete">Delete</button>
+                    </p>
+                  </div>
+                </li>`;
+  });
+
+  return `<ul class="film-details__comments-list">
+            ${comments}
+          </ul>`;
+};
+
+const createDetailedCardTemplate = (filmData, commentsData) => {
   const {poster, title, originalTitle, description, rating, ageRating, country,
     releaseDate, runningTime, genres, director, scriptwriters, actors, isInWatchlist, isWatched, isFavorite} = filmData;
-
-  const renderGenres = () => {
-    const genresTitle = genres.length > 1 ? 'Genres' : 'Genre';
-    let genresTable = '';
-
-    genres.forEach((element) => {
-      genresTable += `<span class="film-details__genre">${element}</span>`;
-    });
-
-    return `<tr class="film-details__row">
-              <td class="film-details__term">${genresTitle}</td>
-              <td class="film-details__cell">
-                ${genresTable}
-              </td>
-            </tr>`;
-  };
-
-  const renderCheckedState = (flag) => {
-    return flag ? 'checked' : '';
-  };
-
-  const renderComments = () => {
-    if (!commentsData) {
-      return;
-    }
-
-    let comments = '';
-
-    commentsData.forEach((element) => {
-      comments += `<li class="film-details__comment">
-                    <span class="film-details__comment-emoji">
-                      <img src="./images/emoji/${element.emotion}.png" width="55" height="55" alt="emoji-${element.emotion}">
-                    </span>
-                    <div>
-                      <p class="film-details__comment-text">${element.text.join(' ')}</p>
-                      <p class="film-details__comment-info">
-                        <span class="film-details__comment-author">${element.author}</span>
-                        <span class="film-details__comment-day">${element.date.format('YYYY/MM/DD HH:mm')}</span>
-                        <button class="film-details__comment-delete">Delete</button>
-                      </p>
-                    </div>
-                  </li>`;
-    });
-
-    return `<ul class="film-details__comments-list">
-              ${comments}
-            </ul>`;
-  };
 
   return `<section class="film-details">
             <form class="film-details__inner" action="" method="get">
@@ -100,7 +102,7 @@ export const createDetailedCardTemplate = (filmData, commentsData) => {
                         <td class="film-details__term">Country</td>
                         <td class="film-details__cell">${country}</td>
                       </tr>
-                      ${renderGenres()}
+                      ${renderGenres(genres)}
                     </table>
 
                     <p class="film-details__film-description">${description.join(' ')}</p>
@@ -123,7 +125,7 @@ export const createDetailedCardTemplate = (filmData, commentsData) => {
                 <section class="film-details__comments-wrap">
                   <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsData.length}</span></h3>
 
-                  ${renderComments()}
+                  ${renderComments(commentsData)}
 
                   <div class="film-details__new-comment">
                     <div class="film-details__add-emoji-label"></div>
@@ -159,3 +161,27 @@ export const createDetailedCardTemplate = (filmData, commentsData) => {
             </form>
           </section>`;
 };
+
+export default class DetailedCard {
+  constructor(film, comments) {
+    this._film = film;
+    this._comments = comments;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createDetailedCardTemplate(this._film, this._comments);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
