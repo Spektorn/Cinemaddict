@@ -25,3 +25,21 @@ export const getSlicedDataFromMap = (map, startIndex, endIndex) => {
   return Array.from(map.keys()).slice(startIndex, endIndex)
     .reduce((slicedMap, key) => slicedMap.set(key, map.get(key)), new Map);
 };
+
+export const createElement = (template) => {
+  const newElement = document.createElement('div');
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+};
+
+export const renderElement = (container, element, place) => {
+  switch (place) {
+    case 'afterbegin':
+      container.prepend(element);
+      break;
+    case 'beforeend':
+      container.append(element);
+      break;
+  }
+};
