@@ -1,10 +1,6 @@
 import dayjs from 'dayjs';
 
-import {getRandomInteger} from '../utilities.js';
-import {getRandomFloat} from '../utilities.js';
-import {getRandomBoolean} from '../utilities.js';
-import {getRandomArrayValue} from '../utilities.js';
-import {getSeveralRandomArrayValues} from '../utilities.js';
+import {getRandomInteger, getRandomFloat, getRandomBoolean, getRandomArrayValue, getSeveralRandomArrayValues} from '../utilities/common.js';
 
 //* Mock-данные
 const posters = [

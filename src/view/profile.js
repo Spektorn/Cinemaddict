@@ -1,4 +1,4 @@
-import {createElement} from '../utilities.js';
+import AbstractView from './abstract.js';
 
 const rankToQuantityBarrier = {
   'Novice': 1,
@@ -29,25 +29,14 @@ const createProfileTemplate = (watchedFilmsQuantity) => {
           </section>`;
 };
 
-export default class Profile {
+export default class Profile extends AbstractView {
   constructor(watchedFilmsQuantity) {
+    super();
+
     this._watchedFilmsQuantity = watchedFilmsQuantity;
-    this._element = null;
   }
 
   getTemplate() {
     return createProfileTemplate(this._watchedFilmsQuantity);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
