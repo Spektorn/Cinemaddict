@@ -8,7 +8,8 @@ import ShowMoreButtonView from './view/show-more-button.js';
 import CardView from './view/card.js';
 import DetailedCardView from './view/detailed-card.js';
 
-import {getSlicedDataFromMap, renderElement} from './utilities.js';
+import {getSlicedDataFromMap} from './utilities/common.js';
+import {renderElement} from './utilities/render.js';
 
 import {generateFilmsData} from './mock/film.js';
 import {generateFilterData} from './mock/filter.js';
@@ -40,27 +41,19 @@ const renderFilm = (listElement, film, comments) => {
     }
   };
 
-  const onOpenClick = (evt) => {
-    evt.preventDefault();
+  cardComponent.setToDetailedClickHandler(() => {
     replaceBriefToDetailed();
     document.addEventListener('keydown', onEscKeyDown);
     document.body.classList.add('hide-overflow');
-  };
+  });
 
-  const onCloseClick = (evt) => {
-    evt.preventDefault();
+  detailedCardComponent.setToBriefClickHandler(() => {
     replaceDetailedToBrief();
     document.removeEventListener('keydown', onEscKeyDown);
     document.body.classList.remove('hide-overflow');
-  };
+  });
 
-  cardComponent.getElement().querySelector('.film-card__poster').addEventListener('click', onOpenClick);
-  cardComponent.getElement().querySelector('.film-card__title').addEventListener('click', onOpenClick);
-  cardComponent.getElement().querySelector('.film-card__comments').addEventListener('click', onOpenClick);
-
-  detailedCardComponent.getElement().querySelector('.film-details__close-btn').addEventListener('click', onCloseClick);
-
-  renderElement(listElement, cardComponent.getElement(), 'beforeend');
+  renderElement(listElement, cardComponent, 'beforeend');
 };
 
 //* Генерация mock-данных
@@ -74,19 +67,19 @@ const siteMainElement = document.querySelector('.main');
 const siteFooterElement = document.querySelector('.footer');
 const footerStatisticsElement = siteFooterElement.querySelector('.footer__statistics');
 
-renderElement(siteHeaderElement, new ProfileView(filterData.History).getElement(), 'beforeend');
-renderElement(siteMainElement, new NavigationView(filterData).getElement(), 'beforeend');
-renderElement(siteMainElement, new SortView().getElement(), 'beforeend');
-renderElement(footerStatisticsElement, new StatisticsView(filterData.All).getElement(), 'beforeend');
+renderElement(siteHeaderElement, new ProfileView(filterData.History), 'beforeend');
+renderElement(siteMainElement, new NavigationView(filterData), 'beforeend');
+renderElement(siteMainElement, new SortView(), 'beforeend');
+renderElement(footerStatisticsElement, new StatisticsView(filterData.All), 'beforeend');
 
-if(filmsData.size === 0) {
-  renderElement(siteMainElement, new EmptyListView().getElement(), 'beforeend');
-} else {
-  renderElement(siteMainElement, new ListView().getElement(), 'beforeend');
+const filmsListComponent = filmsData.size ? new ListView() : new EmptyListView();
 
-  const mainFilmsListElement = siteMainElement.querySelector('.films-list');
-  const mainFilmsListContainerElement = mainFilmsListElement.querySelector('.films-list__container');
-  const extraFilmsListContainerElements = siteMainElement.querySelectorAll('.films-list--extra .films-list__container');
+renderElement(siteMainElement, filmsListComponent, 'beforeend');
+
+if(filmsListComponent instanceof ListView) {
+  const mainFilmsListElement = filmsListComponent.getElement().querySelector('.films-list');
+  const mainFilmsListContainerElement = filmsListComponent.getElement().querySelector('.films-list__container');
+  const extraFilmsListContainerElements = filmsListComponent.getElement().querySelectorAll('.films-list--extra .films-list__container');
 
   for (const [key, value] of getSlicedDataFromMap(filmsData, 0, FILM_QUANTITY_PER_STEP).entries()) {
     renderFilm(mainFilmsListContainerElement, key, value);
@@ -99,15 +92,12 @@ if(filmsData.size === 0) {
   });
 
   if (filmsData.size > FILM_QUANTITY_PER_STEP) {
+    const showMoreButtonComponent = new ShowMoreButtonView();
     let renderedFilmCount = FILM_QUANTITY_PER_STEP;
 
-    renderElement(mainFilmsListElement, new ShowMoreButtonView().getElement(), 'beforeend');
+    renderElement(mainFilmsListElement, showMoreButtonComponent, 'beforeend');
 
-    const loadMoreButton = mainFilmsListElement.querySelector('.films-list__show-more');
-
-    loadMoreButton.addEventListener('click', (evt) => {
-      evt.preventDefault();
-
+    showMoreButtonComponent.setClickHandler(() => {
       for (const [key, value] of getSlicedDataFromMap(filmsData, renderedFilmCount, renderedFilmCount + FILM_QUANTITY_PER_STEP).entries()) {
         renderFilm(mainFilmsListContainerElement, key, value);
       }
@@ -115,7 +105,7 @@ if(filmsData.size === 0) {
       renderedFilmCount += FILM_QUANTITY_PER_STEP;
 
       if (renderedFilmCount >= filmsData.size) {
-        loadMoreButton.remove();
+        showMoreButtonComponent.getElement().remove();
       }
     });
   }

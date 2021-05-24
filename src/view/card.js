@@ -1,4 +1,4 @@
-import {createElement} from '../utilities.js';
+import AbstractView from './abstract.js';
 
 const MAX_DESCRIPTION_LENGTH = 140;
 
@@ -37,26 +37,29 @@ const createCardTemplate = (filmData, commentsData) => {
             </div>
           </article>`;
 };
-export default class Card {
+export default class Card extends AbstractView {
   constructor(film, comments) {
+    super();
+
     this._film = film;
     this._comments = comments;
-    this._element = null;
+    this._toDetailedClickHandler = this._toDetailedClickHandler.bind(this);
+  }
+
+  _toDetailedClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.toDetailedClick();
+  }
+
+  setToDetailedClickHandler(callback) {
+    this._callback.toDetailedClick = callback;
+
+    this.getElement().querySelector('.film-card__poster').addEventListener('click', this._toDetailedClickHandler);
+    this.getElement().querySelector('.film-card__title').addEventListener('click', this._toDetailedClickHandler);
+    this.getElement().querySelector('.film-card__comments').addEventListener('click', this._toDetailedClickHandler);
   }
 
   getTemplate() {
     return createCardTemplate(this._film, this._comments);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

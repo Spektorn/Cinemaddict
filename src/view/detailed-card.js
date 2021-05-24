@@ -1,4 +1,4 @@
-import {createElement} from '../utilities.js';
+import AbstractView from './abstract.js';
 
 const renderGenres = (genres) => {
   const genresTitle = genres.length > 1 ? 'Genres' : 'Genre';
@@ -162,26 +162,27 @@ const createDetailedCardTemplate = (filmData, commentsData) => {
           </section>`;
 };
 
-export default class DetailedCard {
+export default class DetailedCard extends AbstractView {
   constructor(film, comments) {
+    super();
+
     this._film = film;
     this._comments = comments;
-    this._element = null;
+    this._toBriefClickHandler = this._toBriefClickHandler.bind(this);
+  }
+
+  _toBriefClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.toBriefClick();
+  }
+
+  setToBriefClickHandler(callback) {
+    this._callback.toBriefClick = callback;
+
+    this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._toBriefClickHandler);
   }
 
   getTemplate() {
     return createDetailedCardTemplate(this._film, this._comments);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
