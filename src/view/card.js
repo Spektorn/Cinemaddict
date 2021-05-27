@@ -16,8 +16,8 @@ const renderActiveClass = (flag) => {
   return flag ? 'film-card__controls-item--active' : '';
 };
 
-const createCardTemplate = (filmData, commentsData) => {
-  const {poster, title, description, rating, releaseDate, runningTime, genres, isInWatchlist, isWatched, isFavorite} = filmData;
+const createCardTemplate = (film, comments) => {
+  const {poster, title, description, rating, releaseDate, runningTime, genres, isInWatchlist, isWatched, isFavorite} = film;
 
   return `<article class="film-card">
             <h3 class="film-card__title">${title}</h3>
@@ -29,7 +29,7 @@ const createCardTemplate = (filmData, commentsData) => {
             </p>
             <img src="./images/posters/${poster}" alt="${title}" class="film-card__poster">
             <p class="film-card__description">${renderDescription(description)}</p>
-            <a class="film-card__comments">${commentsData.length} comments</a>
+            <a class="film-card__comments">${comments.length} comments</a>
             <div class="film-card__controls">
               <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist ${renderActiveClass(isInWatchlist)}" type="button">Add to watchlist</button>
               <button class="film-card__controls-item button film-card__controls-item--mark-as-watched ${renderActiveClass(isWatched)}" type="button">Mark as watched</button>
@@ -43,12 +43,31 @@ export default class Card extends AbstractView {
 
     this._film = film;
     this._comments = comments;
+
     this._toDetailedClickHandler = this._toDetailedClickHandler.bind(this);
+    this._toWatchlistClickHandler = this._toWatchlistClickHandler.bind(this);
+    this._toWatchedClickHandler = this._toWatchedClickHandler.bind(this);
+    this._toFavoriteClickHandler =  this._toFavoriteClickHandler.bind(this);
   }
 
   _toDetailedClickHandler(evt) {
     evt.preventDefault();
     this._callback.toDetailedClick();
+  }
+
+  _toWatchlistClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.toWatchlistClick();
+  }
+
+  _toWatchedClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.toWatchedClick();
+  }
+
+  _toFavoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.toFavoriteClick();
   }
 
   setToDetailedClickHandler(callback) {
@@ -57,6 +76,24 @@ export default class Card extends AbstractView {
     this.getElement().querySelector('.film-card__poster').addEventListener('click', this._toDetailedClickHandler);
     this.getElement().querySelector('.film-card__title').addEventListener('click', this._toDetailedClickHandler);
     this.getElement().querySelector('.film-card__comments').addEventListener('click', this._toDetailedClickHandler);
+  }
+
+  setToWatchlistClickHandler(callback) {
+    this._callback.toWatchlistClick = callback;
+
+    this.getElement().querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this._toWatchlistClickHandler);
+  }
+
+  setToWatchedClickHandler(callback) {
+    this._callback.toWatchedClick = callback;
+
+    this.getElement().querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this._toWatchedClickHandler);
+  }
+
+  setToFavoriteClickHandler(callback) {
+    this._callback.toFavoriteClick = callback;
+
+    this.getElement().querySelector('.film-card__controls-item--favorite').addEventListener('click', this._toFavoriteClickHandler);
   }
 
   getTemplate() {

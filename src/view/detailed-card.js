@@ -20,15 +20,15 @@ const renderCheckedState = (flag) => {
   return flag ? 'checked' : '';
 };
 
-const renderComments = (commentsData) => {
-  if (!commentsData) {
+const renderComments = (comments) => {
+  if (!comments) {
     return;
   }
 
-  let comments = '';
+  let renderedComments = '';
 
-  commentsData.forEach((element) => {
-    comments += `<li class="film-details__comment">
+  comments.forEach((element) => {
+    renderedComments += `<li class="film-details__comment">
                   <span class="film-details__comment-emoji">
                     <img src="./images/emoji/${element.emotion}.png" width="55" height="55" alt="emoji-${element.emotion}">
                   </span>
@@ -44,13 +44,13 @@ const renderComments = (commentsData) => {
   });
 
   return `<ul class="film-details__comments-list">
-            ${comments}
+            ${renderedComments}
           </ul>`;
 };
 
-const createDetailedCardTemplate = (filmData, commentsData) => {
+const createDetailedCardTemplate = (film, comments) => {
   const {poster, title, originalTitle, description, rating, ageRating, country,
-    releaseDate, runningTime, genres, director, scriptwriters, actors, isInWatchlist, isWatched, isFavorite} = filmData;
+    releaseDate, runningTime, genres, director, scriptwriters, actors, isInWatchlist, isWatched, isFavorite} = film;
 
   return `<section class="film-details">
             <form class="film-details__inner" action="" method="get">
@@ -123,9 +123,9 @@ const createDetailedCardTemplate = (filmData, commentsData) => {
 
               <div class="film-details__bottom-container">
                 <section class="film-details__comments-wrap">
-                  <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsData.length}</span></h3>
+                  <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
-                  ${renderComments(commentsData)}
+                  ${renderComments(comments)}
 
                   <div class="film-details__new-comment">
                     <div class="film-details__add-emoji-label"></div>
@@ -168,7 +168,11 @@ export default class DetailedCard extends AbstractView {
 
     this._film = film;
     this._comments = comments;
+
     this._toBriefClickHandler = this._toBriefClickHandler.bind(this);
+    this._toWatchlistClickHandler = this._toWatchlistClickHandler.bind(this);
+    this._toWatchedClickHandler = this._toWatchedClickHandler.bind(this);
+    this._toFavoriteClickHandler =  this._toFavoriteClickHandler.bind(this);
   }
 
   _toBriefClickHandler(evt) {
@@ -176,10 +180,43 @@ export default class DetailedCard extends AbstractView {
     this._callback.toBriefClick();
   }
 
+  _toWatchlistClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.toWatchlistClick();
+  }
+
+  _toWatchedClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.toWatchedClick();
+  }
+
+  _toFavoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.toFavoriteClick();
+  }
+
   setToBriefClickHandler(callback) {
     this._callback.toBriefClick = callback;
 
     this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._toBriefClickHandler);
+  }
+
+  setToWatchlistClickHandler(callback) {
+    this._callback.toWatchlistClick = callback;
+
+    this.getElement().querySelector('input#watchlist').addEventListener('click', this._toWatchlistClickHandler);
+  }
+
+  setToWatchedClickHandler(callback) {
+    this._callback.toWatchedClick = callback;
+
+    this.getElement().querySelector('input#watched').addEventListener('click', this._toWatchedClickHandler);
+  }
+
+  setToFavoriteClickHandler(callback) {
+    this._callback.toFavoriteClick = callback;
+
+    this.getElement().querySelector('input#favorite').addEventListener('click', this._toFavoriteClickHandler);
   }
 
   getTemplate() {

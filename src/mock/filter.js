@@ -5,12 +5,12 @@ const taskToFilterMap = {
   Favorites: (films) => films.filter((item) => item.isFavorite).length,
 };
 
-export const generateFilterData = (films) => {
-  const filterData = new Object;
+export const generateFilters = (films) => {
+  const filters = new Object;
 
   for (const [filterName, countFilms] of Object.entries(taskToFilterMap)) {
-    filterData[filterName] = countFilms(films);
+    filters[filterName] = countFilms(films);
   }
 
-  return filterData;
+  return filters;
 };

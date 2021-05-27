@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import {nanoid} from 'nanoid';
 
 import {getRandomInteger, getRandomFloat, getRandomBoolean, getRandomArrayValue, getSeveralRandomArrayValues} from '../utilities/common.js';
 
@@ -115,6 +116,7 @@ export const generateFilm = () => {
   const currentTitle = getRandomArrayValue(titles);
 
   return {
+    id: nanoid(),
     poster: getRandomArrayValue(posters),
     title: currentTitle,
     originalTitle: currentTitle,
@@ -135,7 +137,7 @@ export const generateFilm = () => {
 };
 
 //* Генерация фильма и комментариев к нему
-export const generateFilmData = () => {
+export const generateFilmCollection = () => {
   const MIN_COMMENT_QUANTITY = 0;
   const MAX_COMMENT_QUANTITY = 5;
 
@@ -144,12 +146,12 @@ export const generateFilmData = () => {
 };
 
 //* Генерация коллекции связанных фильмов и комментариев
-export const generateFilmsData = (filmsQuantity) => {
-  const filmsData = new Map;
+export const generateFilmsCollection = (filmsQuantity) => {
+  const filmsCollection = new Map;
 
   for (let i = 0; i < filmsQuantity; i++) {
-    filmsData.set(...(generateFilmData()));
+    filmsCollection.set(...(generateFilmCollection()));
   }
 
-  return filmsData;
+  return filmsCollection;
 };

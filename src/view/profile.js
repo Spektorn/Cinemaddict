@@ -8,7 +8,7 @@ const rankToQuantityBarrier = {
 
 const renderRank = (watchedFilmsQuantity) => {
   if(!watchedFilmsQuantity) {
-    return;
+    return '';
   }
 
   let currentRank;
