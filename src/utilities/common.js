@@ -25,3 +25,17 @@ export const getSlicedDataFromMap = (map, startIndex, endIndex) => {
   return Array.from(map.keys()).slice(startIndex, endIndex)
     .reduce((slicedMap, key) => slicedMap.set(key, map.get(key)), new Map);
 };
+
+export const updateCollection = (collection, updatedItem) => {
+  const updatingItemIndex = Array.from(collection.keys()).findIndex((item) => item.id === updatedItem.keys().next().value.id);
+
+  if (updatingItemIndex === -1) {
+    return collection;
+  }
+
+  return new Map([
+    ...getSlicedDataFromMap(collection, 0, updatingItemIndex),
+    ...updatedItem,
+    ...getSlicedDataFromMap(collection, updatingItemIndex + 1, collection.size),
+  ]);
+};

@@ -10,7 +10,7 @@ const createListTemplate = () => {
               </div>
             </section>
 
-            <section class="films-list films-list--extra">
+            <section id="top-rated" class="films-list films-list--extra">
               <h2 class="films-list__title">Top rated</h2>
 
               <div class="films-list__container">
@@ -18,7 +18,7 @@ const createListTemplate = () => {
               </div>
             </section>
 
-            <section class="films-list films-list--extra">
+            <section id="most-commented" class="films-list films-list--extra">
               <h2 class="films-list__title">Most commented</h2>
 
               <div class="films-list__container">
