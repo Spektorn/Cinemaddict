@@ -125,15 +125,15 @@ export default class Film {
   }
 
   _handleAddToWatchlist() {
-    this._changeData(this._invertFilmState('isInWatchlist'));
+    this._changeData(this._invertFilmState(FilmState.WATCHLIST));
   }
 
   _handleAddToWatched() {
-    this._changeData(this._invertFilmState('isWatched'));
+    this._changeData(this._invertFilmState(FilmState.HISTORY));
   }
 
   _handleAddToFavorite() {
-    this._changeData(this._invertFilmState('isFavorite'));
+    this._changeData(this._invertFilmState(FilmState.FAVORITE));
   }
 
   _escKeyDownHandler(evt) {
