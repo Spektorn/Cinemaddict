@@ -1,6 +1,7 @@
 import FilmView from '../view/card.js';
 import DetailedFilmView from '../view/detailed-card.js';
 
+import {FilmState} from '../constants.js';
 import {renderElement, replaceElement, operateWithChildElement, removeComponent} from '../utilities/render.js';
 
 const Mode = {
@@ -72,18 +73,18 @@ export default class Film {
     }
   }
 
-  _invertFilmFlag(flagName) {
-    let invertedFlag = {};
+  _invertFilmState(stateName) {
+    let invertedState = {};
 
-    switch(flagName) {
-      case 'isInWatchlist':
-        invertedFlag = {isInWatchlist: !this._film.isInWatchlist};
+    switch(stateName) {
+      case FilmState.WATCHLIST:
+        invertedState = {isInWatchlist: !this._film.isInWatchlist};
         break;
-      case 'isWatched':
-        invertedFlag = {isWatched: !this._film.isWatched};
+      case FilmState.HISTORY:
+        invertedState = {isWatched: !this._film.isWatched};
         break;
-      case 'isFavorite':
-        invertedFlag = {isFavorite: !this._film.isFavorite};
+      case FilmState.FAVORITE:
+        invertedState = {isFavorite: !this._film.isFavorite};
         break;
     }
 
@@ -92,7 +93,7 @@ export default class Film {
         Object.assign(
           {},
           this._film,
-          invertedFlag,
+          invertedState,
         ),
         this._comments,
       ],
@@ -124,15 +125,15 @@ export default class Film {
   }
 
   _handleAddToWatchlist() {
-    this._changeData(this._invertFilmFlag('isInWatchlist'));
+    this._changeData(this._invertFilmState(FilmState.WATCHLIST));
   }
 
   _handleAddToWatched() {
-    this._changeData(this._invertFilmFlag('isWatched'));
+    this._changeData(this._invertFilmState(FilmState.HISTORY));
   }
 
   _handleAddToFavorite() {
-    this._changeData(this._invertFilmFlag('isFavorite'));
+    this._changeData(this._invertFilmState(FilmState.FAVORITE));
   }
 
   _escKeyDownHandler(evt) {
