@@ -1,7 +1,7 @@
 import FilmView from '../view/card.js';
 import DetailedFilmView from '../view/detailed-card.js';
 
-import {FilmState} from '../constants.js';
+import {FilmState, UserAction, UpdateType} from '../constants.js';
 import {renderElement, replaceElement, operateWithChildElement, removeComponent} from '../utilities/render.js';
 
 const Mode = {
@@ -55,6 +55,7 @@ export default class Film {
     replaceElement(this._filmBriefComponent, prevFilmBriefComponent);
 
     if (this._mode === Mode.DETAILED) {
+      console.log('detailed');
       replaceElement(this._filmDetailedComponent, prevFilmDetailedComponent);
     }
 
@@ -125,15 +126,27 @@ export default class Film {
   }
 
   _handleAddToWatchlist() {
-    this._changeData(this._invertFilmState(FilmState.WATCHLIST));
+    this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MINOR,
+      this._invertFilmState(FilmState.WATCHLIST)
+    );
   }
 
   _handleAddToWatched() {
-    this._changeData(this._invertFilmState(FilmState.HISTORY));
+    this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MINOR,
+      this._invertFilmState(FilmState.HISTORY)
+    );
   }
 
   _handleAddToFavorite() {
-    this._changeData(this._invertFilmState(FilmState.FAVORITE));
+    this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.MINOR,
+      this._invertFilmState(FilmState.FAVORITE)
+    );
   }
 
   _escKeyDownHandler(evt) {
