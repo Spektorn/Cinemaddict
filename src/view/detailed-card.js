@@ -82,9 +82,10 @@ const renderEmotionsList = (currentEmotion) => {
      </label>`).join('');
 };
 
-const createDetailedCardTemplate = (film, comments) => {
+const createDetailedCardTemplate = (film) => {
   const {poster, title, originalTitle, description, rating, ageRating, country,
-    releaseDate, runningTime, genres, director, scriptwriters, actors, isInWatchlist, isWatched, isFavorite, newCommentText, newCommentEmotion} = film;
+    releaseDate, runningTime, genres, director, scriptwriters, actors,
+    isInWatchlist, isWatched, isFavorite, comments, newCommentText, newCommentEmotion} = film;
 
   return `<section class="film-details">
             <form class="film-details__inner" action="" method="get">
@@ -187,8 +188,11 @@ export default class DetailedCard extends SmartView {
   constructor(film, comments) {
     super();
 
-    this._state = DetailedCard.parseDataToState(film);
-    this._comments = comments;
+    this._state = DetailedCard.parseDataToState(
+      new Map([
+        [film, comments]
+      ])
+    );
 
     this._toBriefClickHandler = this._toBriefClickHandler.bind(this);
     this._toWatchlistCheckHandler = this._toWatchlistCheckHandler.bind(this);
@@ -224,7 +228,9 @@ export default class DetailedCard extends SmartView {
     evt.preventDefault();
     this.updateState({
       newCommentText: evt.target.value,
-    });
+    },
+      false
+    );
   }
 
   _emotionChangeHandler(evt) {
@@ -242,9 +248,9 @@ export default class DetailedCard extends SmartView {
   restoreHandlers() {
     this._setInnerHandlers();
     this.setToBriefClickHandler(this._callback.toBriefClick);
-    this.setToWatchlistClickHandler(this._callback.toWatchlistCheck);
-    this.setToWatchedClickHandler(this._callback.toWatchedCheck);
-    this.setToFavoriteClickHandler(this._callback.toFavoriteCheck);
+    this.setToWatchlistCheckHandler(this._callback.toWatchlistCheck);
+    this.setToWatchedCheckHandler(this._callback.toWatchedCheck);
+    this.setToFavoriteCheckHandler(this._callback.toFavoriteCheck);
   }
 
   setToBriefClickHandler(callback) {
@@ -253,33 +259,42 @@ export default class DetailedCard extends SmartView {
     this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._toBriefClickHandler);
   }
 
-  setToWatchlistClickHandler(callback) {
+  setFilmStatusCheckHandler(callback) {
+    this._callback.filmStatusCheck = callback;
+
+    this.getElement().querySelector('input#watchlist').addEventListener('change', this._filmStatusCheckHandler);
+    this.getElement().querySelector('input#watched').addEventListener('change', this._filmStatusCheckHandler);
+    this.getElement().querySelector('input#favorite').addEventListener('change', this._filmStatusCheckHandler);
+  }
+
+  setToWatchlistCheckHandler(callback) {
     this._callback.toWatchlistCheck = callback;
 
     this.getElement().querySelector('input#watchlist').addEventListener('change', this._toWatchlistCheckHandler);
   }
 
-  setToWatchedClickHandler(callback) {
+  setToWatchedCheckHandler(callback) {
     this._callback.toWatchedCheck = callback;
 
-    this.getElement().querySelector('input#watched').addEventListener('click', this._toWatchedCheckHandler);
+    this.getElement().querySelector('input#watched').addEventListener('change', this._toWatchedCheckHandler);
   }
 
-  setToFavoriteClickHandler(callback) {
+  setToFavoriteCheckHandler(callback) {
     this._callback.toFavoriteCheck = callback;
 
-    this.getElement().querySelector('input#favorite').addEventListener('click', this._toFavoriteCheckHandler);
+    this.getElement().querySelector('input#favorite').addEventListener('change', this._toFavoriteCheckHandler);
   }
 
   getTemplate() {
-    return createDetailedCardTemplate(this._state, this._comments);
+    return createDetailedCardTemplate(this._state);
   }
 
   static parseDataToState(data) {
     return Object.assign(
       {},
-      data,
+      data.keys().next().value,
       {
+      	comments: data.values().next().value,
         newCommentText: null,
         newCommentEmotion: null,
       },
@@ -288,10 +303,16 @@ export default class DetailedCard extends SmartView {
 
   static parseStateToData(state) {
     state = Object.assign({}, state);
+    const comments = state.comments;
 
+    delete state.comments;
     delete state.newCommentText;
     delete state.newCommentEmotion;
 
-    return state;
+    return new Map([
+      [
+        state, comments
+      ]
+    ]);
   }
 }

@@ -43,9 +43,9 @@ export default class Film {
     this._filmBriefComponent.setToFavoriteClickHandler(this._handleAddToFavorite);
 
     this._filmDetailedComponent.setToBriefClickHandler(this._handleToBriefClick);
-    this._filmDetailedComponent.setToWatchlistClickHandler(this._handleAddToWatchlist);
-    this._filmDetailedComponent.setToWatchedClickHandler(this._handleAddToWatched);
-    this._filmDetailedComponent.setToFavoriteClickHandler(this._handleAddToFavorite);
+    this._filmDetailedComponent.setToWatchlistCheckHandler(this._handleAddToWatchlist);
+    this._filmDetailedComponent.setToWatchedCheckHandler(this._handleAddToWatched);
+    this._filmDetailedComponent.setToFavoriteCheckHandler(this._handleAddToFavorite);
 
     if (prevFilmBriefComponent === null || prevFilmDetailedComponent === null) {
       renderElement(this._filmsListContainer, this._filmBriefComponent, 'beforeend');
@@ -55,7 +55,6 @@ export default class Film {
     replaceElement(this._filmBriefComponent, prevFilmBriefComponent);
 
     if (this._mode === Mode.DETAILED) {
-      console.log('detailed');
       replaceElement(this._filmDetailedComponent, prevFilmDetailedComponent);
     }
 
