@@ -1,4 +1,9 @@
+import {nanoid} from 'nanoid';
+
 import SmartView from './smart.js';
+
+import {getRandomArrayValue} from '../utilities/common.js';
+import {getTodayDate, dateFormatReleaseDetailed, dateFormatComment} from '../utilities/date.js';
 
 const renderGenres = (genres) => {
   const genresTitle = genres.length > 1 ? 'Genres' : 'Genre';
@@ -33,11 +38,11 @@ const renderComments = (comments) => {
                     <img src="./images/emoji/${element.emotion}.png" width="55" height="55" alt="emoji-${element.emotion}">
                   </span>
                   <div>
-                    <p class="film-details__comment-text">${element.text.join(' ')}</p>
+                    <p class="film-details__comment-text">${element.text}</p>
                     <p class="film-details__comment-info">
                       <span class="film-details__comment-author">${element.author}</span>
-                      <span class="film-details__comment-day">${element.date.format('YYYY/MM/DD HH:mm')}</span>
-                      <button class="film-details__comment-delete">Delete</button>
+                      <span class="film-details__comment-day">${dateFormatComment(element.date)}</span>
+                      <button class="film-details__comment-delete" data-comment-id="${element.id}">Delete</button>
                     </p>
                   </div>
                 </li>`;
@@ -74,12 +79,13 @@ const renderEmotionsList = (currentEmotion) => {
     'angry',
   ];
 
-  return availableEmotions.map((emotion) =>
-    `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}"
+  return availableEmotions.map((emotion) => {
+    return `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}"
     value="${emotion}" ${currentEmotion === emotion ? 'checked' : ''}>
     <label class="film-details__emoji-label" for="emoji-${emotion}">
       <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji">
-    </label>`).join('');
+    </label>`
+  }).join('');
 };
 
 const createDetailedCardTemplate = (film) => {
@@ -127,7 +133,7 @@ const createDetailedCardTemplate = (film) => {
                       </tr>
                       <tr class="film-details__row">
                         <td class="film-details__term">Release Date</td>
-                        <td class="film-details__cell">${releaseDate.format('DD MMMM YYYY')}</td>
+                        <td class="film-details__cell">${dateFormatReleaseDetailed(releaseDate)}</td>
                       </tr>
                       <tr class="film-details__row">
                         <td class="film-details__term">Runtime</td>
@@ -140,7 +146,7 @@ const createDetailedCardTemplate = (film) => {
                       ${renderGenres(genres)}
                     </table>
 
-                    <p class="film-details__film-description">${description.join(' ')}</p>
+                    <p class="film-details__film-description">${description}</p>
                   </div>
                 </div>
 
@@ -159,23 +165,15 @@ const createDetailedCardTemplate = (film) => {
               <div class="film-details__bottom-container">
                 <section class="film-details__comments-wrap">
                   <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
-
                   ${renderComments(comments)}
-
                   <div class="film-details__new-comment">
-
                     ${renderNewCommentEmotion(newCommentEmotion)}
-
                     <label class="film-details__comment-label">
-
                       ${renderNewCommentText(newCommentText)}
-
                     </label>
 
                     <div class="film-details__emoji-list">
-
                       ${renderEmotionsList(newCommentEmotion)}
-
                     </div>
                   </div>
                 </section>
@@ -194,10 +192,15 @@ export default class DetailedCard extends SmartView {
       ])
     );
 
+    this._prevNewCommentText = null;
+    this._prevNewCommentEmotion = null;
+
     this._toBriefClickHandler = this._toBriefClickHandler.bind(this);
     this._toWatchlistCheckHandler = this._toWatchlistCheckHandler.bind(this);
     this._toWatchedCheckHandler = this._toWatchedCheckHandler.bind(this);
     this._toFavoriteCheckHandler =  this._toFavoriteCheckHandler.bind(this);
+    this._commentAddHandler = this._commentAddHandler.bind(this);
+    this._commentDeleteHandler = this._commentDeleteHandler.bind(this);
     this._commentTextChangeHandler = this._commentTextChangeHandler.bind(this);
     this._emotionChangeHandler = this._emotionChangeHandler.bind(this);
 
@@ -222,6 +225,27 @@ export default class DetailedCard extends SmartView {
   _toFavoriteCheckHandler(evt) {
     evt.preventDefault();
     this._callback.toFavoriteCheck();
+  }
+
+  _commentAddHandler() {
+    if (this._state.newCommentText && this._state.newCommentEmotion) {
+      this._callback.addCommentKeyDown(
+        DetailedCard.parseStateToData(this._state, false, true)
+      );
+    }
+  }
+
+  _commentDeleteHandler(evt) {
+    evt.preventDefault();
+
+    const deleteButton = evt.target.closest('.film-details__comment-delete');
+
+    if (deleteButton) {
+      this._state.comments.splice(this._state.comments.findIndex((comment) => comment.id === deleteButton.dataset.commentId), 1);
+      this._callback.deleteCommentClick(
+        DetailedCard.parseStateToData(this._state, true, false)
+      );
+    }
   }
 
   _commentTextChangeHandler(evt) {
@@ -251,6 +275,7 @@ export default class DetailedCard extends SmartView {
     this.setToWatchlistCheckHandler(this._callback.toWatchlistCheck);
     this.setToWatchedCheckHandler(this._callback.toWatchedCheck);
     this.setToFavoriteCheckHandler(this._callback.toFavoriteCheck);
+    this.setСommentDeleteHandler(this._callback.deleteCommentClick);
   }
 
   setToBriefClickHandler(callback) {
@@ -285,6 +310,18 @@ export default class DetailedCard extends SmartView {
     this.getElement().querySelector('input#favorite').addEventListener('change', this._toFavoriteCheckHandler);
   }
 
+  setСommentDeleteHandler(callback) {
+    this._callback.deleteCommentClick = callback;
+
+    this.getElement().querySelector('.film-details__comments-list').addEventListener('click', this._commentDeleteHandler);
+  }
+
+  initСommentAddHandler(callback) {
+    this._callback.addCommentKeyDown = callback;
+
+    this._commentAddHandler();
+  }
+
   getTemplate() {
     return createDetailedCardTemplate(this._state);
   }
@@ -295,15 +332,38 @@ export default class DetailedCard extends SmartView {
       data.keys().next().value,
       {
       	comments: data.values().next().value,
-        newCommentText: null,
-        newCommentEmotion: null,
+        newCommentText: this._prevNewCommentText,
+        newCommentEmotion: this._prevNewCommentEmotion,
       },
     );
   }
 
-  static parseStateToData(state) {
+  static parseStateToData(state, isNewCommentSaving, isNewCommentAdding) {
+    //* Временная генерация случайного автора для нового комментария до загрузки данных с сервера
+    const people = [
+      'Anthony Mann',
+      'Anne Wigton',
+      'Heinz Herald',
+      'Richard Weil',
+      'Erich von Stroheim',
+      'Mary Beth Hughes',
+      'Dan Duryea',
+    ];
+
     state = Object.assign({}, state);
     const comments = state.comments;
+    this._prevNewCommentText = isNewCommentSaving ? state.newCommentText : null;
+    this._prevNewCommentEmotion = isNewCommentSaving ? state.newCommentEmotion : null;
+
+    if(isNewCommentAdding) {
+      comments.push({
+        id: nanoid(),
+        author: getRandomArrayValue(people),
+        date: getTodayDate(),
+        text: state.newCommentText,
+        emotion: state.newCommentEmotion,
+      });
+    }
 
     delete state.comments;
     delete state.newCommentText;

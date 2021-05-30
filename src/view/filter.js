@@ -29,9 +29,9 @@ export default class Filter extends AbstractView {
   }
 
   _filterClickHandler(evt) {
-    const newFilter = evt.target.closest('.main-navigation__item');
-
     evt.preventDefault();
+
+    const newFilter = evt.target.closest('.main-navigation__item');
 
     if (newFilter) {
       this._callback.filterClick(newFilter.dataset.filterType);

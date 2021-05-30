@@ -1,3 +1,8 @@
+export const KeyCode = {
+  ENTER: 13,
+  ESCAPE: 27,
+};
+
 export const FilmState = {
   WATCHLIST: 'isInWatchlist',
   HISTORY: 'isWatched',
