@@ -1,4 +1,5 @@
 import {nanoid} from 'nanoid';
+import he from 'he';
 
 import SmartView from './smart.js';
 
@@ -38,7 +39,7 @@ const renderComments = (comments) => {
                     <img src="./images/emoji/${element.emotion}.png" width="55" height="55" alt="emoji-${element.emotion}">
                   </span>
                   <div>
-                    <p class="film-details__comment-text">${element.text}</p>
+                    <p class="film-details__comment-text">${he.encode(element.text)}</p>
                     <p class="film-details__comment-info">
                       <span class="film-details__comment-author">${element.author}</span>
                       <span class="film-details__comment-day">${dateFormatComment(element.date)}</span>
