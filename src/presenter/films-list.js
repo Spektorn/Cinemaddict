@@ -1,6 +1,5 @@
 import FilmsListView from '../view/list.js';
 import EmptyListView from '../view/empty-list.js';
-import NavigationView from '../view/navigation.js';
 import SortView from '../view/sort.js';
 import ShowMoreButtonView from '../view/show-more-button.js';
 
@@ -9,14 +8,16 @@ import FilmPresenter from './film.js';
 import {SortType, UpdateType, UserAction} from '../constants.js';
 import {getSlicedDataFromMap} from '../utilities/common.js';
 import {renderElement, removeComponent} from '../utilities/render.js';
+import {filterMap} from '../utilities/filter.js';
 import {sortFilmsByReleaseDate, sortFilmsByRating} from '../utilities/sort.js';
 
 export const FILMS_QUANTITY_PER_STEP = 5;
 
 export default class FilmsList {
-  constructor(generalContainer, filmsModel) {
+  constructor(generalContainer, filmsModel, filterModel) {
     this._generalContainer = generalContainer;
     this._filmsModel = filmsModel;
+    this._filterModel = filterModel;
 
     this._renderedFilmsQuantity = FILMS_QUANTITY_PER_STEP;
     this._currentSortType = SortType.DEFAULT;
@@ -38,26 +39,32 @@ export default class FilmsList {
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
 
     this._filmsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
   }
 
-  init(filters) {
-    this._filters = Object.assign({}, filters);
-    this._navigationComponent = new NavigationView(this._filters);
-
+  init() {
     this._renderFilmsList();
   }
 
   _getFilms() {
+    const films = this._filmsModel.getFilms();
+    const currentFilter = this._filterModel.getFilter();
+
+    let filtredFilms = filterMap[currentFilter](Array.from(films.keys())).reduce(
+      (filtredMap, key) => filtredMap.set(key, films.get(key)), new Map);
+
     switch (this._currentSortType) {
       case SortType.BY_DATE:
-        return Array.from(this._filmsModel.getFilms().keys()).sort(sortFilmsByReleaseDate).reduce(
-          (sortedMap, key) => sortedMap.set(key, this._filmsModel.getFilms().get(key)), new Map);
+        filtredFilms = Array.from(filtredFilms.keys()).sort(sortFilmsByReleaseDate).reduce(
+          (sortedMap, key) => sortedMap.set(key, filtredFilms.get(key)), new Map);
+        break;
       case SortType.BY_RATING:
-        return Array.from(this._filmsModel.getFilms().keys()).sort(sortFilmsByRating).reduce(
-          (sortedMap, key) => sortedMap.set(key, this._filmsModel.getFilms().get(key)), new Map);
+        filtredFilms = Array.from(filtredFilms.keys()).sort(sortFilmsByRating).reduce(
+          (sortedMap, key) => sortedMap.set(key, filtredFilms.get(key)), new Map);
+        break;
     }
 
-    return this._filmsModel.getFilms();
+    return filtredFilms;
   }
 
   _handleViewAction(actionType, updateType, update) {
@@ -119,10 +126,6 @@ export default class FilmsList {
     renderElement(this._generalContainer, this._emptyListComponent, 'beforeend');
   }
 
-  _renderNavigation() {
-    renderElement(this._generalContainer, this._navigationComponent, 'beforeend');
-  }
-
   _renderSort() {
     if (this._sortComponent !== null) {
       this._sortComponent = null;
@@ -180,7 +183,6 @@ export default class FilmsList {
       return;
     }
 
-    this._renderNavigation();
     this._renderSort();
     this._renderListContent();
   }

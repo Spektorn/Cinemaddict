@@ -4,6 +4,13 @@ export const FilmState = {
   FAVORITE: 'isFavorite',
 };
 
+export const FilterType = {
+  ALL: 'all',
+  WATCHLIST: 'watchlist',
+  HISTORY: 'history',
+  FAVORITES: 'favorites',
+};
+
 export const SortType = {
   DEFAULT: 'default',
   BY_DATE: 'by-date',
