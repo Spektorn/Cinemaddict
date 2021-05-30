@@ -173,7 +173,7 @@ export default class Film {
   _handleCommentAdd(film) {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UserAction.PATCH,
+      UpdateType.PATCH,
       film,
     );
 
@@ -192,7 +192,7 @@ export default class Film {
   _handleCommentDelete(film) {
     this._changeData(
       UserAction.UPDATE_FILM,
-      UserAction.PATCH,
+      UpdateType.PATCH,
       film,
     );
 

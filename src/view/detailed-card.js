@@ -231,7 +231,7 @@ export default class DetailedCard extends SmartView {
   _commentAddHandler() {
     if (this._state.newCommentText && this._state.newCommentEmotion) {
       this._callback.addCommentKeyDown(
-        DetailedCard.parseStateToData(this._state, false, true),
+        DetailedCard.parseStateToData(this._state, {isNewCommentSaving: false, isNewCommentAdding: true}),
       );
     }
   }
@@ -244,7 +244,7 @@ export default class DetailedCard extends SmartView {
     if (deleteButton) {
       this._state.comments.splice(this._state.comments.findIndex((comment) => comment.id === deleteButton.dataset.commentId), 1);
       this._callback.deleteCommentClick(
-        DetailedCard.parseStateToData(this._state, true, false),
+        DetailedCard.parseStateToData(this._state, {isNewCommentSaving: true, isNewCommentAdding: false}),
       );
     }
   }
@@ -339,7 +339,7 @@ export default class DetailedCard extends SmartView {
     );
   }
 
-  static parseStateToData(state, isNewCommentSaving, isNewCommentAdding) {
+  static parseStateToData(state, {isNewCommentSaving, isNewCommentAdding} = {}) {
     //* Временная генерация случайного автора для нового комментария до загрузки данных с сервера
     const people = [
       'Anthony Mann',
