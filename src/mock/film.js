@@ -1,7 +1,7 @@
-import dayjs from 'dayjs';
 import {nanoid} from 'nanoid';
 
 import {getRandomInteger, getRandomFloat, getRandomBoolean, getRandomArrayValue, getSeveralRandomArrayValues} from '../utilities/common.js';
+import {generateDate} from '../utilities/date.js';
 
 //* Mock-данные
 const posters = [
@@ -71,27 +71,6 @@ const emotions = [
   'angry',
 ];
 
-const generateDate = (type) => {
-  const PAST_YEAR_GAP = 45;
-
-  const dateType = {
-    'releaseDate': {
-      'isInPast': true,
-      'maxDaysGap': 365,
-    },
-    'commentDate': {
-      'isInPast': false,
-      'maxDaysGap': 14,
-    },
-  };
-
-  const date = dateType[type]['isInPast'] ? dayjs().add(-PAST_YEAR_GAP, 'year') : dayjs();
-
-  const daysGap = getRandomInteger(-(dateType[type]['maxDaysGap']), dateType[type]['maxDaysGap']);
-
-  return date.add(daysGap, 'day');
-};
-
 const generateRunningTime = () => {
   const hours = getRandomInteger(0, 3);
   const minutes = getRandomInteger(1, 59);
@@ -104,9 +83,10 @@ const generateRunningTime = () => {
 //* Генерация комментария
 export const generateComment = () => {
   return {
+    id: nanoid(),
     author: getRandomArrayValue(people),
     date: generateDate('commentDate'),
-    text: getSeveralRandomArrayValues(sentences),
+    text: getSeveralRandomArrayValues(sentences).join(' '),
     emotion: getRandomArrayValue(emotions),
   };
 };
@@ -120,7 +100,7 @@ export const generateFilm = () => {
     poster: getRandomArrayValue(posters),
     title: currentTitle,
     originalTitle: currentTitle,
-    description: getSeveralRandomArrayValues(sentences),
+    description: getSeveralRandomArrayValues(sentences).join(' '),
     rating: getRandomFloat(),
     ageRating: getRandomArrayValue(ageRatings),
     country: getRandomArrayValue(countries),

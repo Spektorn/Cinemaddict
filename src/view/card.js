@@ -1,15 +1,15 @@
 import AbstractView from './abstract.js';
 
+import {dateFormatReleaseBrief} from '../utilities/date.js';
+
 const MAX_DESCRIPTION_LENGTH = 140;
 
 const renderDescription = (description) => {
-  const changedDescription = description.slice().join(' ');
-
-  if (changedDescription.length > MAX_DESCRIPTION_LENGTH) {
-    return `${changedDescription.slice(0, MAX_DESCRIPTION_LENGTH - 1)}…`;
+  if (description.length > MAX_DESCRIPTION_LENGTH) {
+    return `${description.slice(0, MAX_DESCRIPTION_LENGTH - 1)}…`;
   }
 
-  return changedDescription;
+  return description;
 };
 
 const renderActiveClass = (flag) => {
@@ -23,7 +23,7 @@ const createCardTemplate = (film, comments) => {
             <h3 class="film-card__title">${title}</h3>
             <p class="film-card__rating">${rating}</p>
             <p class="film-card__info">
-              <span class="film-card__year">${releaseDate.format('YYYY')}</span>
+              <span class="film-card__year">${dateFormatReleaseBrief(releaseDate)}</span>
               <span class="film-card__duration">${runningTime}</span>
               <span class="film-card__genre">${genres[0]}</span>
             </p>
