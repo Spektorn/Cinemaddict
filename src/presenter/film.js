@@ -150,7 +150,7 @@ export default class Film {
     this._changeData(
       UserAction.UPDATE_FILM,
       this._defineUpdateType(FilterType.WATCHLIST),
-      this._invertFilmState(FilmState.WATCHLIST)
+      this._invertFilmState(FilmState.WATCHLIST),
     );
   }
 
@@ -158,7 +158,7 @@ export default class Film {
     this._changeData(
       UserAction.UPDATE_FILM,
       this._defineUpdateType(FilterType.HISTORY),
-      this._invertFilmState(FilmState.HISTORY)
+      this._invertFilmState(FilmState.HISTORY),
     );
   }
 
@@ -166,7 +166,7 @@ export default class Film {
     this._changeData(
       UserAction.UPDATE_FILM,
       this._defineUpdateType(FilterType.FAVORITES),
-      this._invertFilmState(FilmState.FAVORITE)
+      this._invertFilmState(FilmState.FAVORITE),
     );
   }
 

@@ -5,7 +5,7 @@ const renderFilters = (filters, activeFilter) => {
     `<a href="#${id}" class="main-navigation__item ${id === activeFilter ? 'main-navigation__item--active' : ''}"
     data-filter-type="${id}">${title} ${id !== 'all' ? `<span class="main-navigation__item-count">${quantity}</span>` : ''}</a>`)
     .join('');
-}
+};
 
 const createFilterTemplate = (filters, activeFilter) => {
   return `<nav class="main-navigation">

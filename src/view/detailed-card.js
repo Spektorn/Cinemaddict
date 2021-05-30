@@ -85,7 +85,7 @@ const renderEmotionsList = (currentEmotion) => {
     value="${emotion}" ${currentEmotion === emotion ? 'checked' : ''}>
     <label class="film-details__emoji-label" for="emoji-${emotion}">
       <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji">
-    </label>`
+    </label>`;
   }).join('');
 };
 
@@ -189,8 +189,8 @@ export default class DetailedCard extends SmartView {
 
     this._state = DetailedCard.parseDataToState(
       new Map([
-        [film, comments]
-      ])
+        [film, comments],
+      ]),
     );
 
     this._prevNewCommentText = null;
@@ -231,7 +231,7 @@ export default class DetailedCard extends SmartView {
   _commentAddHandler() {
     if (this._state.newCommentText && this._state.newCommentEmotion) {
       this._callback.addCommentKeyDown(
-        DetailedCard.parseStateToData(this._state, false, true)
+        DetailedCard.parseStateToData(this._state, false, true),
       );
     }
   }
@@ -244,7 +244,7 @@ export default class DetailedCard extends SmartView {
     if (deleteButton) {
       this._state.comments.splice(this._state.comments.findIndex((comment) => comment.id === deleteButton.dataset.commentId), 1);
       this._callback.deleteCommentClick(
-        DetailedCard.parseStateToData(this._state, true, false)
+        DetailedCard.parseStateToData(this._state, true, false),
       );
     }
   }
@@ -254,7 +254,7 @@ export default class DetailedCard extends SmartView {
     this.updateState({
       newCommentText: evt.target.value,
     },
-      false
+    false,
     );
   }
 
@@ -332,7 +332,7 @@ export default class DetailedCard extends SmartView {
       {},
       data.keys().next().value,
       {
-      	comments: data.values().next().value,
+        comments: data.values().next().value,
         newCommentText: this._prevNewCommentText,
         newCommentEmotion: this._prevNewCommentEmotion,
       },
@@ -372,8 +372,8 @@ export default class DetailedCard extends SmartView {
 
     return new Map([
       [
-        state, comments
-      ]
+        state, comments,
+      ],
     ]);
   }
 }
