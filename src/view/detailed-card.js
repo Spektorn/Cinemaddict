@@ -3,7 +3,6 @@ import he from 'he';
 
 import SmartView from './smart.js';
 
-import {getRandomArrayValue} from '../utilities/common.js';
 import {getTodayDate, dateFormatReleaseDetailed, dateFormatComment} from '../utilities/date.js';
 
 const renderGenres = (genres) => {
@@ -342,7 +341,7 @@ export default class DetailedCard extends SmartView {
     if(isNewCommentAdding) {
       state.comments.push({
         id: nanoid(),
-        author: getRandomArrayValue(people),
+        author: 'Username',
         date: getTodayDate(),
         text: state.newCommentText,
         emotion: state.newCommentEmotion,

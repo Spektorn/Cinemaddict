@@ -90,10 +90,10 @@ export default class Film {
     }
 
     return Object.assign(
-          {},
-          this._film,
-          invertedState,
-        );
+      {},
+      this._film,
+      invertedState,
+    );
   }
 
   _renderDetailedCard() {
