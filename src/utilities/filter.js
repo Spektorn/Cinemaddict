@@ -1,4 +1,4 @@
-import {FilterType} from '../constants.js';
+import {FilterType} from './constants.js';
 
 export const filterMap = {
   [FilterType.ALL]: (films) => films,

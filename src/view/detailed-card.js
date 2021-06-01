@@ -39,7 +39,7 @@ const renderComments = (comments) => {
                     <img src="./images/emoji/${element.emotion}.png" width="55" height="55" alt="emoji-${element.emotion}">
                   </span>
                   <div>
-                    <p class="film-details__comment-text">${he.encode(element.text)}</p>
+                    <p class="film-details__comment-text">${he.encode(element.comment)}</p>
                     <p class="film-details__comment-info">
                       <span class="film-details__comment-author">${element.author}</span>
                       <span class="film-details__comment-day">${dateFormatComment(element.date)}</span>
@@ -102,7 +102,7 @@ const createDetailedCardTemplate = (film) => {
                 </div>
                 <div class="film-details__info-wrap">
                   <div class="film-details__poster">
-                    <img class="film-details__poster-img" src="./images/posters/${poster}" alt="${title}">
+                    <img class="film-details__poster-img" src="${poster}" alt="${title}">
 
                     <p class="film-details__age">${ageRating} +</p>
                   </div>
@@ -184,17 +184,13 @@ const createDetailedCardTemplate = (film) => {
 };
 
 export default class DetailedCard extends SmartView {
-  constructor(film, comments) {
+  constructor(film) {
     super();
-
-    this._state = DetailedCard.parseDataToState(
-      new Map([
-        [film, comments],
-      ]),
-    );
 
     this._prevNewCommentText = null;
     this._prevNewCommentEmotion = null;
+
+    this._state = DetailedCard.parseDataToState(film);
 
     this._toBriefClickHandler = this._toBriefClickHandler.bind(this);
     this._toWatchlistCheckHandler = this._toWatchlistCheckHandler.bind(this);
@@ -203,7 +199,7 @@ export default class DetailedCard extends SmartView {
     this._commentAddHandler = this._commentAddHandler.bind(this);
     this._commentDeleteHandler = this._commentDeleteHandler.bind(this);
     this._commentTextChangeHandler = this._commentTextChangeHandler.bind(this);
-    this._emotionChangeHandler = this._emotionChangeHandler.bind(this);
+    this._commentEmotionChangeHandler = this._commentEmotionChangeHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -258,7 +254,7 @@ export default class DetailedCard extends SmartView {
     );
   }
 
-  _emotionChangeHandler(evt) {
+  _commentEmotionChangeHandler(evt) {
     evt.preventDefault();
     this.updateState({
       newCommentEmotion: evt.target.value,
@@ -266,7 +262,7 @@ export default class DetailedCard extends SmartView {
   }
 
   _setInnerHandlers() {
-    this.getElement().querySelector('.film-details__emoji-list').addEventListener('change', this._emotionChangeHandler);
+    this.getElement().querySelector('.film-details__emoji-list').addEventListener('change', this._commentEmotionChangeHandler);
     this.getElement().querySelector('.film-details__comment-input').addEventListener('change', this._commentTextChangeHandler);
   }
 
@@ -330,9 +326,8 @@ export default class DetailedCard extends SmartView {
   static parseDataToState(data) {
     return Object.assign(
       {},
-      data.keys().next().value,
+      data,
       {
-        comments: data.values().next().value,
         newCommentText: this._prevNewCommentText,
         newCommentEmotion: this._prevNewCommentEmotion,
       },
@@ -340,24 +335,12 @@ export default class DetailedCard extends SmartView {
   }
 
   static parseStateToData(state, {isNewCommentSaving, isNewCommentAdding} = {}) {
-    //* Временная генерация случайного автора для нового комментария до загрузки данных с сервера
-    const people = [
-      'Anthony Mann',
-      'Anne Wigton',
-      'Heinz Herald',
-      'Richard Weil',
-      'Erich von Stroheim',
-      'Mary Beth Hughes',
-      'Dan Duryea',
-    ];
-
     state = Object.assign({}, state);
-    const comments = state.comments;
     this._prevNewCommentText = isNewCommentSaving ? state.newCommentText : null;
     this._prevNewCommentEmotion = isNewCommentSaving ? state.newCommentEmotion : null;
 
     if(isNewCommentAdding) {
-      comments.push({
+      state.comments.push({
         id: nanoid(),
         author: getRandomArrayValue(people),
         date: getTodayDate(),
@@ -366,14 +349,9 @@ export default class DetailedCard extends SmartView {
       });
     }
 
-    delete state.comments;
     delete state.newCommentText;
     delete state.newCommentEmotion;
 
-    return new Map([
-      [
-        state, comments,
-      ],
-    ]);
+    return state;
   }
 }
