@@ -96,14 +96,14 @@ export default class Film {
     );
   }
 
-  _renderDetailedCard() {
+  _renderDetailedFilm() {
     const prevFilmDetailedComponent = this._filmDetailedComponent;
 
     this._api.getComments(this._film.id).then((comments) => {
       this._commentsModel.setComments(comments);
-      this._film.comments = this._commentsModel.getComments();
+      this._detailedComments = this._commentsModel.getComments();
 
-      this._filmDetailedComponent = new DetailedFilmView(this._film);
+      this._filmDetailedComponent = new DetailedFilmView(this._film, this._detailedComments);
 
       this._filmDetailedComponent.setToBriefClickHandler(this._handleToBriefClick);
       this._filmDetailedComponent.setToWatchlistCheckHandler(this._handleAddToWatchlist);
@@ -123,7 +123,7 @@ export default class Film {
     this._changeMode();
 
     this._mode = Mode.DETAILED;
-    this._renderDetailedCard();
+    this._renderDetailedFilm();
   }
 
   _closeDetailedCard() {

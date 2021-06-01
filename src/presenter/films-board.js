@@ -66,7 +66,7 @@ export default class FilmsBoard {
         return filtredFilms.slice().sort(sortFilmsByRating);
     }
 
-    return filtredFilms;
+    return filtredFilms.slice();
   }
 
   _handleViewAction(actionType, updateType, update) {
@@ -82,7 +82,9 @@ export default class FilmsBoard {
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH:
-        this._filmPresenters[data.id].init(data);
+        if (data.id in this._filmPresenters) {
+          this._filmPresenters[data.id].init(data);
+        }
 
         if (data.id in this._filmPresentersTopRated) {
           this._filmPresentersTopRated[data.id].init(data);
