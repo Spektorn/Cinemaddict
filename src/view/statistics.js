@@ -18,7 +18,7 @@ const getGenresData = (watchedFilms) => {
     labels: uniqueGenres,
     quantity: quantityPerGenre,
   };
-}
+};
 
 const getTopGenreName = (genresData) => {
   const index = genresData.quantity.indexOf(Math.max(...genresData.quantity));
@@ -100,7 +100,7 @@ const renderChart = (statisticCtx, watchedFilms) => {
 
 const getChartHeight = (genresData) => {
   return genresData.labels.length * BAR_HEIGHT;
-}
+};
 
 const createStatisticsTemplate = ({currentFilms, currentStatisticsFilterType} = {}) => {
   const genresData = getGenresData(currentFilms);

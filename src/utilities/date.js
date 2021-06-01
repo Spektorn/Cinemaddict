@@ -19,11 +19,11 @@ export const dateFormatComment = (date) => {
 
 export const runtimeAdapter = (minutes) => {
   return dayjs.duration(minutes, 'm').hours() + 'h ' + dayjs.duration(minutes, 'm').minutes() + 'm';
-}
+};
 
 export const statisticsRuntimeAdapter = (minutes) => {
   return {
     hours: dayjs.duration(minutes, 'm').hours(),
     minutes: dayjs.duration(minutes, 'm').minutes(),
-  }
-}
+  };
+};

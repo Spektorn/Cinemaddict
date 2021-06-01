@@ -6,7 +6,6 @@ import FilmsBoardPresenter from './presenter/films-board.js';
 import FilterPresenter from './presenter/filter.js';
 
 import ProfileView from './view/profile.js';
-import StatisticsView from './view/statistics.js';
 import FooterStatisticsView from './view/footer-statistics.js';
 
 import {UpdateType} from './utilities/constants.js';
