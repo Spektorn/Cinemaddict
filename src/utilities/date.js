@@ -3,7 +3,9 @@ import duration from 'dayjs/plugin/duration';
 
 dayjs.extend(duration);
 
-import {getRandomInteger} from './common.js';
+export const getTodayDate = () => {
+  return dayjs();
+};
 
 export const dateFormatReleaseBrief = (date) => {
   return dayjs(date).format('YYYY');
@@ -19,6 +21,9 @@ export const runtimeAdapter = (minutes) => {
   return dayjs.duration(minutes, 'm').hours() + 'h ' + dayjs.duration(minutes, 'm').minutes() + 'm';
 }
 
-export const getTodayDate = () => {
-  return dayjs();
-};
+export const statisticsRuntimeAdapter = (minutes) => {
+  return {
+    hours: dayjs.duration(minutes, 'm').hours(),
+    minutes: dayjs.duration(minutes, 'm').minutes(),
+  }
+}

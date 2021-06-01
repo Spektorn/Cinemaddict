@@ -28,8 +28,10 @@ export default class Film {
     this._handleAddToWatchlist = this._handleAddToWatchlist.bind(this);
     this._handleAddToWatched = this._handleAddToWatched.bind(this);
     this._handleAddToFavorite = this._handleAddToFavorite.bind(this);
+    //! Переделать под серверные данные
     this._handleCommentAdd = this._handleCommentAdd.bind(this);
     this._handleCommentDelete = this._handleCommentDelete.bind(this);
+
     this._ctrlEnterKeyDownHandler = this._ctrlEnterKeyDownHandler.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
@@ -53,17 +55,6 @@ export default class Film {
 
     replaceElement(this._filmBriefComponent, prevFilmBriefComponent);
     removeComponent(prevFilmBriefComponent);
-  }
-
-  destroyInstance() {
-    removeComponent(this._filmBriefComponent);
-    removeComponent(this._filmDetailedComponent);
-  }
-
-  resetView() {
-    if (this._mode !== Mode.BRIEF) {
-      this._closeDetailedCard();
-    }
   }
 
   _defineUpdateType(filterType) {
@@ -175,6 +166,7 @@ export default class Film {
     );
   }
 
+  //! Переделать под серверные данные
   _handleCommentAdd(film) {
     this._changeData(
       UserAction.UPDATE_FILM,
@@ -225,6 +217,17 @@ export default class Film {
       document.removeEventListener('keydown', this._ctrlEnterKeyDownHandler);
       document.removeEventListener('keydown', this._escKeyDownHandler);
       document.body.classList.remove('hide-overflow');
+    }
+  }
+
+  destroyInstance() {
+    removeComponent(this._filmBriefComponent);
+    removeComponent(this._filmDetailedComponent);
+  }
+
+  resetView() {
+    if (this._mode !== Mode.BRIEF) {
+      this._closeDetailedCard();
     }
   }
 }

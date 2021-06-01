@@ -1,9 +1,8 @@
 import FilterView from '../view/filter.js';
 
-import {UpdateType, FilterType} from '../utilities/constants.js';
+import {FilterType, UpdateType} from '../utilities/constants.js';
 import {renderElement, replaceElement, removeComponent} from '../utilities/render.js';
 import {filterMap} from '../utilities/filter.js';
-
 
 export default class Filter {
   constructor(filterContainer, filterModel, filmsModel) {
@@ -16,8 +15,8 @@ export default class Filter {
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
-    this._filmsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+    this._filmsModel.addObserver(this._handleModelEvent);
   }
 
   init() {

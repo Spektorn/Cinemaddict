@@ -75,3 +75,27 @@ export const removeComponent = (component) => {
   component.getElement().remove();
   component.removeElement();
 };
+
+export const showComponent = (component) => {
+  if (component === null) {
+    return;
+  }
+
+  if (!(component instanceof Abstract)) {
+    throw new Error('Can show only components');
+  }
+
+  component.getElement().classList.remove('visually-hidden');
+};
+
+export const hideComponent = (component) => {
+  if (component === null) {
+    return;
+  }
+
+  if (!(component instanceof Abstract)) {
+    throw new Error('Can hide only components');
+  }
+
+  component.getElement().classList.add('visually-hidden');
+};
