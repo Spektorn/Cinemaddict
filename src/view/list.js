@@ -1,6 +1,6 @@
 import AbstractView from './abstract.js';
 
-import {ListType} from '../constants.js';
+import {ListType} from '../utilities/constants.js';
 
 const createListTemplate = (listType) => {
   switch (listType) {
@@ -24,6 +24,8 @@ const createListTemplate = (listType) => {
               </section>`;
     case ListType.EMPTY:
       return '<h2 class="films-list__title">There are no movies in our database</h2>';
+    case ListType.LOADING:
+      return '<h2 class="films-list__title">Loading...</h2>';
   }
 };
 

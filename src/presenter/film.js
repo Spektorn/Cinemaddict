@@ -1,7 +1,7 @@
 import FilmView from '../view/card.js';
 import DetailedFilmView from '../view/detailed-card.js';
 
-import {KeyCode, FilmState, FilterType, UserAction, UpdateType} from '../constants.js';
+import {KeyCode, FilmState, FilterType, UserAction, UpdateType} from '../utilities/constants.js';
 import {renderElement, replaceElement, operateWithChildElement, removeComponent} from '../utilities/render.js';
 
 const Mode = {
@@ -10,12 +10,14 @@ const Mode = {
 };
 
 export default class Film {
-  constructor(filmsListContainer, changeData, changeMode, filmsModel, filterModel) {
+  constructor(filmsListContainer, changeData, changeMode, filmsModel, commentsModel, filterModel, api) {
     this._filmsListContainer = filmsListContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
     this._filmsModel = filmsModel;
+    this._commentsModel = commentsModel;
     this._filterModel = filterModel;
+    this._api = api;
 
     this._filmBriefComponent = null;
     this._filmDetailedComponent = null;
@@ -32,40 +34,25 @@ export default class Film {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init(film, comments) {
+  init(film) {
     this._film = film;
-    this._comments = comments;
 
     const prevFilmBriefComponent = this._filmBriefComponent;
-    const prevFilmDetailedComponent = this._filmDetailedComponent;
 
-    this._filmBriefComponent = new FilmView(this._film, this._comments);
-    this._filmDetailedComponent = new DetailedFilmView(this._film, this._comments);
+    this._filmBriefComponent = new FilmView(this._film);
 
     this._filmBriefComponent.setToDetailedClickHandler(this._handleToDetailedClick);
     this._filmBriefComponent.setToWatchlistClickHandler(this._handleAddToWatchlist);
     this._filmBriefComponent.setToWatchedClickHandler(this._handleAddToWatched);
     this._filmBriefComponent.setToFavoriteClickHandler(this._handleAddToFavorite);
 
-    this._filmDetailedComponent.setToBriefClickHandler(this._handleToBriefClick);
-    this._filmDetailedComponent.setToWatchlistCheckHandler(this._handleAddToWatchlist);
-    this._filmDetailedComponent.setToWatchedCheckHandler(this._handleAddToWatched);
-    this._filmDetailedComponent.setToFavoriteCheckHandler(this._handleAddToFavorite);
-    this._filmDetailedComponent.setСommentDeleteHandler(this._handleCommentDelete);
-
-    if (prevFilmBriefComponent === null || prevFilmDetailedComponent === null) {
+    if (prevFilmBriefComponent === null) {
       renderElement(this._filmsListContainer, this._filmBriefComponent, 'beforeend');
       return;
     }
 
     replaceElement(this._filmBriefComponent, prevFilmBriefComponent);
-
-    if (this._mode === Mode.DETAILED) {
-      replaceElement(this._filmDetailedComponent, prevFilmDetailedComponent);
-    }
-
     removeComponent(prevFilmBriefComponent);
-    removeComponent(prevFilmDetailedComponent);
   }
 
   destroyInstance() {
@@ -102,23 +89,41 @@ export default class Film {
         break;
     }
 
-    return new Map([
-      [
-        Object.assign(
-          {},
-          this._film,
-          invertedState,
-        ),
-        this._comments,
-      ],
-    ]);
+    return Object.assign(
+      {},
+      this._film,
+      invertedState,
+    );
+  }
+
+  _renderDetailedCard() {
+    const prevFilmDetailedComponent = this._filmDetailedComponent;
+
+    this._api.getComments(this._film.id).then((comments) => {
+      this._commentsModel.setComments(comments);
+      this._film.comments = this._commentsModel.getComments();
+
+      this._filmDetailedComponent = new DetailedFilmView(this._film);
+
+      this._filmDetailedComponent.setToBriefClickHandler(this._handleToBriefClick);
+      this._filmDetailedComponent.setToWatchlistCheckHandler(this._handleAddToWatchlist);
+      this._filmDetailedComponent.setToWatchedCheckHandler(this._handleAddToWatched);
+      this._filmDetailedComponent.setToFavoriteCheckHandler(this._handleAddToFavorite);
+      this._filmDetailedComponent.setСommentDeleteHandler(this._handleCommentDelete);
+
+      if (prevFilmDetailedComponent) {
+        removeComponent(prevFilmDetailedComponent);
+      }
+
+      operateWithChildElement(document.body, this._filmDetailedComponent, 'append');
+    });
   }
 
   _openDetailedCard() {
     this._changeMode();
 
     this._mode = Mode.DETAILED;
-    operateWithChildElement(document.body, this._filmDetailedComponent, 'append');
+    this._renderDetailedCard();
   }
 
   _closeDetailedCard() {

@@ -7,3 +7,7 @@ export const sortFilmsByReleaseDate = (filmA, filmB) => {
 export const sortFilmsByRating = (filmA, filmB) => {
   return filmB.rating - filmA.rating;
 };
+
+export const sortFilmsByComments = (filmA, filmB) => {
+  return filmB.comments.length - filmA.comments.length;
+};

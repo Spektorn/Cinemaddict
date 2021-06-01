@@ -1,6 +1,6 @@
 import FilterView from '../view/filter.js';
 
-import {UpdateType, FilterType} from '../constants.js';
+import {UpdateType, FilterType} from '../utilities/constants.js';
 import {renderElement, replaceElement, removeComponent} from '../utilities/render.js';
 import {filterMap} from '../utilities/filter.js';
 
@@ -37,7 +37,7 @@ export default class Filter {
   }
 
   _getFilters() {
-    const films = Array.from(this._filmsModel.getFilms().keys());
+    const films = this._filmsModel.getFilms();
 
     return [
       {

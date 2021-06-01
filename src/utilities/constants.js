@@ -16,6 +16,7 @@ export const ListType = {
   TOP_RATED: 'top-rated',
   MOST_COMMENTED: 'most-commented',
   EMPTY: 'empty',
+  LOADING: 'loading',
 };
 
 export const FilmState = {
@@ -32,6 +33,7 @@ export const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 export const KeyCode = {

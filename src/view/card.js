@@ -16,8 +16,8 @@ const renderActiveClass = (flag) => {
   return flag ? 'film-card__controls-item--active' : '';
 };
 
-const createCardTemplate = (film, comments) => {
-  const {poster, title, description, rating, releaseDate, runningTime, genres, isInWatchlist, isWatched, isFavorite} = film;
+const createCardTemplate = (film) => {
+  const {poster, title, description, rating, releaseDate, runningTime, genres, isInWatchlist, isWatched, isFavorite, comments} = film;
 
   return `<article class="film-card">
             <h3 class="film-card__title">${title}</h3>
@@ -27,7 +27,7 @@ const createCardTemplate = (film, comments) => {
               <span class="film-card__duration">${runningTime}</span>
               <span class="film-card__genre">${genres[0]}</span>
             </p>
-            <img src="./images/posters/${poster}" alt="${title}" class="film-card__poster">
+            <img src="${poster}" alt="${title}" class="film-card__poster">
             <p class="film-card__description">${renderDescription(description)}</p>
             <a class="film-card__comments">${comments.length} comments</a>
             <div class="film-card__controls">
@@ -38,11 +38,10 @@ const createCardTemplate = (film, comments) => {
           </article>`;
 };
 export default class Card extends AbstractView {
-  constructor(film, comments) {
+  constructor(film) {
     super();
 
     this._film = film;
-    this._comments = comments;
 
     this._toDetailedClickHandler = this._toDetailedClickHandler.bind(this);
     this._toWatchlistClickHandler = this._toWatchlistClickHandler.bind(this);
@@ -97,6 +96,6 @@ export default class Card extends AbstractView {
   }
 
   getTemplate() {
-    return createCardTemplate(this._film, this._comments);
+    return createCardTemplate(this._film);
   }
 }
