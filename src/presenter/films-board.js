@@ -1,12 +1,13 @@
 import BoardView from '../view/board.js';
+import StatisticsView from '../view/statistics.js';
 import ListView from '../view/list';
 import SortView from '../view/sort.js';
 import ShowMoreButtonView from '../view/show-more-button.js';
 
 import FilmPresenter from './film.js';
 
-import {SortType, ListType, UpdateType, UserAction} from '../utilities/constants.js';
-import {renderElement, removeComponent} from '../utilities/render.js';
+import {FilterType, SortType, ListType, UserAction, UpdateType} from '../utilities/constants.js';
+import {renderElement, removeComponent, showComponent, hideComponent} from '../utilities/render.js';
 import {filterMap} from '../utilities/filter.js';
 import {sortFilmsByReleaseDate, sortFilmsByRating, sortFilmsByComments} from '../utilities/sort.js';
 
@@ -33,6 +34,7 @@ export default class FilmsBoard {
     this._mainListComponent = new ListView(ListType.ALL);
     this._emptyListComponent = new ListView(ListType.EMPTY);
     this._loadingListComponent = new ListView(ListType.LOADING);
+    this._statisticsComponent = null;
     this._topRatedListComponent = null;
     this._mostCommentedListComponent = null;
     this._sortComponent = null;
@@ -56,17 +58,18 @@ export default class FilmsBoard {
 
   _getFilms() {
     const films = this._filmsModel.getFilms();
-    const currentFilter = this._filterModel.getFilter();
-    const filtredFilms = filterMap[currentFilter](films);
+    const currentFilterType = this._filterModel.getFilter() !== FilterType.STATISTICS ? this._filterModel.getFilter() : FilterType.ALL;
+    const filtredFilms = filterMap[currentFilterType](films);
 
     switch (this._currentSortType) {
       case SortType.BY_DATE:
         return filtredFilms.slice().sort(sortFilmsByReleaseDate);
       case SortType.BY_RATING:
         return filtredFilms.slice().sort(sortFilmsByRating);
+      case SortType.DEFAULT: {
+        return filtredFilms;
+      }
     }
-
-    return filtredFilms;
   }
 
   _handleViewAction(actionType, updateType, update) {
@@ -82,7 +85,9 @@ export default class FilmsBoard {
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH:
-        this._filmPresenters[data.id].init(data);
+        if (data.id in this._filmPresenters) {
+          this._filmPresenters[data.id].init(data);
+        }
 
         if (data.id in this._filmPresentersTopRated) {
           this._filmPresentersTopRated[data.id].init(data);
@@ -98,6 +103,18 @@ export default class FilmsBoard {
         this._renderFilmsBoard();
         break;
       case UpdateType.MAJOR:
+        if (data === FilterType.STATISTICS) {
+          this._clearFilmsBoard({resetRenderedFilmsQuantity: true, resetSortType: true});
+          hideComponent(this._boardComponent);
+          this._renderStatistics();
+          break;
+        }
+
+        if (this._statisticsComponent) {
+          removeComponent(this._statisticsComponent);
+        }
+
+        showComponent(this._boardComponent);
         this._clearFilmsBoard({resetRenderedFilmsQuantity: true, resetSortType: true});
         this._renderFilmsBoard();
         break;
@@ -105,9 +122,14 @@ export default class FilmsBoard {
         this._isLoading = false;
 
         removeComponent(this._loadingListComponent);
+
         this._renderFilmsBoard();
         break;
     }
+  }
+
+  _resetPresenters(presentersContainer) {
+    Object.values(presentersContainer).forEach((presenter) => presenter.resetView());
   }
 
   _handleModeChange() {
@@ -140,12 +162,17 @@ export default class FilmsBoard {
     }
   }
 
-  _renderEmptyList() {
-    renderElement(this._boardComponent, this._emptyListComponent, 'beforeend');
-  }
+  _renderStatistics() {
+    if (this._statisticsComponent !== null) {
+      this._statisticsComponent = null;
+    }
 
-  _renderLoadingList() {
-    renderElement(this._boardComponent, this._loadingListComponent, 'beforeend');
+    const films = this._filmsModel.getFilms();
+    const watchedFilms = filterMap[FilterType.HISTORY](films);
+
+    this._statisticsComponent = new StatisticsView(watchedFilms);
+
+    renderElement(this._generalContainer, this._statisticsComponent, 'beforeend');
   }
 
   _renderSort() {
@@ -183,6 +210,14 @@ export default class FilmsBoard {
     }
   }
 
+  _renderEmptyList() {
+    renderElement(this._boardComponent, this._emptyListComponent, 'beforeend');
+  }
+
+  _renderLoadingList() {
+    renderElement(this._boardComponent, this._loadingListComponent, 'beforeend');
+  }
+
   _renderMainList() {
     const filmsQuantity = this._getFilms().length;
     const currentFilms = this._getFilms().slice(0, Math.min(filmsQuantity, this._renderedFilmsQuantity));
@@ -203,7 +238,7 @@ export default class FilmsBoard {
     this._topRatedListComponent = new ListView(ListType.TOP_RATED);
     this._topRatedListContainerElement = this._topRatedListComponent.getElement().querySelector('.films-list__container');
 
-    const currentFilms = this._getFilms().sort(sortFilmsByRating).slice(0, EXTRA_FILMS_QUANTITY);
+    const currentFilms = this._getFilms().slice().sort(sortFilmsByRating).slice(0, EXTRA_FILMS_QUANTITY);
 
     this._renderFilms(currentFilms, this._topRatedListContainerElement, this._filmPresentersTopRated);
     renderElement(this._boardComponent, this._topRatedListComponent, 'beforeend');
@@ -217,7 +252,7 @@ export default class FilmsBoard {
     this._mostCommentedListComponent = new ListView(ListType.MOST_COMMENTED);
     this._mostCommentedListContainerElement = this._mostCommentedListComponent.getElement().querySelector('.films-list__container');
 
-    const currentFilms = this._getFilms().sort(sortFilmsByComments).slice(0, EXTRA_FILMS_QUANTITY);
+    const currentFilms = this._getFilms().slice().sort(sortFilmsByComments).slice(0, EXTRA_FILMS_QUANTITY);
 
     this._renderFilms(currentFilms, this._mostCommentedListContainerElement, this._filmPresentersMostCommented);
     renderElement(this._boardComponent, this._mostCommentedListComponent, 'beforeend');
@@ -241,10 +276,6 @@ export default class FilmsBoard {
     }
 
     renderElement(this._generalContainer, this._boardComponent, 'beforeend');
-  }
-
-  _resetPresenters(presentersContainer) {
-    Object.values(presentersContainer).forEach((presenter) => presenter.resetView());
   }
 
   _deletePresenters(presentersContainer) {

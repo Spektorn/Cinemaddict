@@ -14,7 +14,7 @@ const createFilterTemplate = (filters, activeFilter) => {
               ${renderFilters(filters, activeFilter)}
 
             </div>
-            <a href="#stats" class="main-navigation__additional">Stats</a>
+            <a href="#stats" class="main-navigation__additional" data-filter-type="stats">Stats</a>
           </nav>`;
 };
 
@@ -31,7 +31,7 @@ export default class Filter extends AbstractView {
   _filterClickHandler(evt) {
     evt.preventDefault();
 
-    const newFilter = evt.target.closest('.main-navigation__item');
+    const newFilter = evt.target.closest('A');
 
     if (newFilter) {
       this._callback.filterClick(newFilter.dataset.filterType);

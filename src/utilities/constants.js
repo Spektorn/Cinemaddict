@@ -1,8 +1,17 @@
+export const StatisticsFilterType = {
+  ALL_TIME: 'all-time',
+  TODAY: 'today',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
+};
+
 export const FilterType = {
   ALL: 'all',
   WATCHLIST: 'watchlist',
   HISTORY: 'history',
   FAVORITES: 'favorites',
+  STATISTICS: 'stats',
 };
 
 export const SortType = {

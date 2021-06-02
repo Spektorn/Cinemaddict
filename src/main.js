@@ -6,7 +6,7 @@ import FilmsBoardPresenter from './presenter/films-board.js';
 import FilterPresenter from './presenter/filter.js';
 
 import ProfileView from './view/profile.js';
-import StatisticsView from './view/statistics.js';
+import FooterStatisticsView from './view/footer-statistics.js';
 
 import {UpdateType} from './utilities/constants.js';
 import {renderElement} from './utilities/render.js';
@@ -36,7 +36,7 @@ api.getFilms()
   .then((films) => {
     filmsModel.setFilms(UpdateType.INIT, films);
     filterPresenter.init();
-    renderElement(footerStatisticsElement, new StatisticsView(filmsModel.getFilms().length), 'beforeend');
+    renderElement(footerStatisticsElement, new FooterStatisticsView(filmsModel.getFilms().length), 'beforeend');
   })
   .catch(() => {
     filmsModel.setFilms(UpdateType.INIT, []);

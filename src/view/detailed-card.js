@@ -3,15 +3,15 @@ import he from 'he';
 
 import SmartView from './smart.js';
 
-import {getTodayDate, dateFormatReleaseDetailed, dateFormatComment} from '../utilities/date.js';
+import {getTodayDate, dateFormatReleaseDetailed, dateFormatComment, runtimeAdapter} from '../utilities/date.js';
 
 const renderGenres = (genres) => {
   const genresTitle = genres.length > 1 ? 'Genres' : 'Genre';
   let genresTable = '';
 
-  genres.forEach((element) => {
-    genresTable += `<span class="film-details__genre">${element}</span>`;
-  });
+  for (const genre of genres) {
+    genresTable += `<span class="film-details__genre">${genre}</span>`;
+  }
 
   return `<tr class="film-details__row">
             <td class="film-details__term">${genresTitle}</td>
@@ -30,26 +30,26 @@ const renderComments = (comments) => {
     return;
   }
 
-  let renderedComments = '';
+  let commentsList = '';
 
-  comments.forEach((element) => {
-    renderedComments += `<li class="film-details__comment">
+  for (const comment of comments) {
+    commentsList += `<li class="film-details__comment">
                   <span class="film-details__comment-emoji">
-                    <img src="./images/emoji/${element.emotion}.png" width="55" height="55" alt="emoji-${element.emotion}">
+                    <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
                   </span>
                   <div>
-                    <p class="film-details__comment-text">${he.encode(element.comment)}</p>
+                    <p class="film-details__comment-text">${he.encode(comment.comment)}</p>
                     <p class="film-details__comment-info">
-                      <span class="film-details__comment-author">${element.author}</span>
-                      <span class="film-details__comment-day">${dateFormatComment(element.date)}</span>
-                      <button class="film-details__comment-delete" data-comment-id="${element.id}">Delete</button>
+                      <span class="film-details__comment-author">${comment.author}</span>
+                      <span class="film-details__comment-day">${dateFormatComment(comment.date)}</span>
+                      <button class="film-details__comment-delete" data-comment-id="${comment.id}">Delete</button>
                     </p>
                   </div>
                 </li>`;
-  });
+  }
 
   return `<ul class="film-details__comments-list">
-            ${renderedComments}
+            ${commentsList}
           </ul>`;
 };
 
@@ -88,7 +88,7 @@ const renderEmotionsList = (currentEmotion) => {
   }).join('');
 };
 
-const createDetailedCardTemplate = (film) => {
+const createDetailedCardTemplate = (film, detailedComments) => {
   const {poster, title, originalTitle, description, rating, ageRating, country,
     releaseDate, runningTime, genres, director, scriptwriters, actors,
     isInWatchlist, isWatched, isFavorite, comments, newCommentText, newCommentEmotion} = film;
@@ -137,7 +137,7 @@ const createDetailedCardTemplate = (film) => {
                       </tr>
                       <tr class="film-details__row">
                         <td class="film-details__term">Runtime</td>
-                        <td class="film-details__cell">${runningTime}</td>
+                        <td class="film-details__cell">${runtimeAdapter(runningTime)}</td>
                       </tr>
                       <tr class="film-details__row">
                         <td class="film-details__term">Country</td>
@@ -165,7 +165,7 @@ const createDetailedCardTemplate = (film) => {
               <div class="film-details__bottom-container">
                 <section class="film-details__comments-wrap">
                   <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
-                  ${renderComments(comments)}
+                  ${renderComments(detailedComments)}
                   <div class="film-details__new-comment">
                     ${renderNewCommentEmotion(newCommentEmotion)}
                     <label class="film-details__comment-label">
@@ -183,13 +183,14 @@ const createDetailedCardTemplate = (film) => {
 };
 
 export default class DetailedCard extends SmartView {
-  constructor(film) {
+  constructor(film, detailedComments) {
     super();
 
     this._prevNewCommentText = null;
     this._prevNewCommentEmotion = null;
 
     this._state = DetailedCard.parseDataToState(film);
+    this._detailedComments = detailedComments;
 
     this._toBriefClickHandler = this._toBriefClickHandler.bind(this);
     this._toWatchlistCheckHandler = this._toWatchlistCheckHandler.bind(this);
@@ -223,6 +224,7 @@ export default class DetailedCard extends SmartView {
     this._callback.toFavoriteCheck();
   }
 
+  //! Переделать для серверных данных
   _commentAddHandler() {
     if (this._state.newCommentText && this._state.newCommentEmotion) {
       this._callback.addCommentKeyDown(
@@ -280,14 +282,6 @@ export default class DetailedCard extends SmartView {
     this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._toBriefClickHandler);
   }
 
-  setFilmStatusCheckHandler(callback) {
-    this._callback.filmStatusCheck = callback;
-
-    this.getElement().querySelector('input#watchlist').addEventListener('change', this._filmStatusCheckHandler);
-    this.getElement().querySelector('input#watched').addEventListener('change', this._filmStatusCheckHandler);
-    this.getElement().querySelector('input#favorite').addEventListener('change', this._filmStatusCheckHandler);
-  }
-
   setToWatchlistCheckHandler(callback) {
     this._callback.toWatchlistCheck = callback;
 
@@ -306,6 +300,7 @@ export default class DetailedCard extends SmartView {
     this.getElement().querySelector('input#favorite').addEventListener('change', this._toFavoriteCheckHandler);
   }
 
+  //! Переделать для серверных данных
   setСommentDeleteHandler(callback) {
     this._callback.deleteCommentClick = callback;
 
@@ -319,7 +314,7 @@ export default class DetailedCard extends SmartView {
   }
 
   getTemplate() {
-    return createDetailedCardTemplate(this._state);
+    return createDetailedCardTemplate(this._state, this._detailedComments);
   }
 
   static parseDataToState(data) {
@@ -333,6 +328,7 @@ export default class DetailedCard extends SmartView {
     );
   }
 
+  //! Переделать для серверных данных
   static parseStateToData(state, {isNewCommentSaving, isNewCommentAdding} = {}) {
     state = Object.assign({}, state);
     this._prevNewCommentText = isNewCommentSaving ? state.newCommentText : null;
