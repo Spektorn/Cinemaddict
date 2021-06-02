@@ -102,16 +102,15 @@ const getChartHeight = (genresData) => {
   return genresData.labels.length * BAR_HEIGHT;
 };
 
-const createStatisticsTemplate = ({currentFilms, currentStatisticsFilterType} = {}) => {
+const createStatisticsTemplate = ({currentFilms, currentStatisticsFilterType} = {}, userRank) => {
   const genresData = getGenresData(currentFilms);
   const totalRuntimeData = getTotalRuntime(currentFilms);
 
-  //!!! Заменить заглушку ранга на реальные данные
   return `<section class="statistic">
             <p class="statistic__rank">
               Your rank
               <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-              <span class="statistic__rank-label">Movie Buff</span>
+              <span class="statistic__rank-label">${userRank}</span>
             </p>
 
             <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
@@ -157,7 +156,7 @@ const createStatisticsTemplate = ({currentFilms, currentStatisticsFilterType} = 
 };
 
 export default class Statistics extends SmartView {
-  constructor(watchedFilms) {
+  constructor(watchedFilms, userRank) {
     super();
 
     this._state = {
@@ -166,6 +165,7 @@ export default class Statistics extends SmartView {
     };
 
     this._watchedFilms = watchedFilms;
+    this._userRank = userRank;
     this._daysChart = null;
 
     this._statisticsFilterTypeChangeHandler = this._statisticsFilterTypeChangeHandler.bind(this);
@@ -210,6 +210,6 @@ export default class Statistics extends SmartView {
   }
 
   getTemplate() {
-    return createStatisticsTemplate(this._state);
+    return createStatisticsTemplate(this._state, this._userRank);
   }
 }

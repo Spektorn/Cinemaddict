@@ -7,6 +7,7 @@ import ShowMoreButtonView from '../view/show-more-button.js';
 import FilmPresenter from './film.js';
 
 import {FilterType, SortType, ListType, UserAction, UpdateType} from '../utilities/constants.js';
+import {getUserRank} from '../utilities/common.js';
 import {renderElement, removeComponent, showComponent, hideComponent} from '../utilities/render.js';
 import {filterMap} from '../utilities/filter.js';
 import {sortFilmsByReleaseDate, sortFilmsByRating, sortFilmsByComments} from '../utilities/sort.js';
@@ -25,6 +26,7 @@ export default class FilmsBoard {
     this._renderedFilmsQuantity = FILMS_QUANTITY_PER_STEP;
     this._currentSortType = SortType.DEFAULT;
     this._isLoading = true;
+    this._userRank = null;
 
     this._filmPresenters = {};
     this._filmPresentersTopRated = {};
@@ -63,9 +65,9 @@ export default class FilmsBoard {
 
     switch (this._currentSortType) {
       case SortType.BY_DATE:
-        return filtredFilms.slice().sort(sortFilmsByReleaseDate);
+        return filtredFilms.sort(sortFilmsByReleaseDate);
       case SortType.BY_RATING:
-        return filtredFilms.slice().sort(sortFilmsByRating);
+        return filtredFilms.sort(sortFilmsByRating);
       case SortType.DEFAULT: {
         return filtredFilms;
       }
@@ -79,11 +81,19 @@ export default class FilmsBoard {
           this._filmsModel.updateFilm(updateType, response);
         });
         break;
+      case UserAction.ADD_COMMENT:
+        this._commentsModel.updateComments(updateType, update);
+        break;
+      case UserAction.DELETE_COMMENT:
+        this._commentsModel.deleteComment(updateType, update);
+        break;
     }
   }
 
   _handleModelEvent(updateType, data) {
     switch (updateType) {
+      case UpdateType.COMMENT:
+        break;
       case UpdateType.PATCH:
         if (data.id in this._filmPresenters) {
           this._filmPresenters[data.id].init(data);
@@ -169,8 +179,9 @@ export default class FilmsBoard {
 
     const films = this._filmsModel.getFilms();
     const watchedFilms = filterMap[FilterType.HISTORY](films);
+    this._userRank = getUserRank(watchedFilms.length);
 
-    this._statisticsComponent = new StatisticsView(watchedFilms);
+    this._statisticsComponent = new StatisticsView(watchedFilms, this._userRank);
 
     renderElement(this._generalContainer, this._statisticsComponent, 'beforeend');
   }
@@ -238,7 +249,7 @@ export default class FilmsBoard {
     this._topRatedListComponent = new ListView(ListType.TOP_RATED);
     this._topRatedListContainerElement = this._topRatedListComponent.getElement().querySelector('.films-list__container');
 
-    const currentFilms = this._getFilms().slice().sort(sortFilmsByRating).slice(0, EXTRA_FILMS_QUANTITY);
+    const currentFilms = this._getFilms().sort(sortFilmsByRating).slice(0, EXTRA_FILMS_QUANTITY);
 
     this._renderFilms(currentFilms, this._topRatedListContainerElement, this._filmPresentersTopRated);
     renderElement(this._boardComponent, this._topRatedListComponent, 'beforeend');
@@ -252,7 +263,7 @@ export default class FilmsBoard {
     this._mostCommentedListComponent = new ListView(ListType.MOST_COMMENTED);
     this._mostCommentedListContainerElement = this._mostCommentedListComponent.getElement().querySelector('.films-list__container');
 
-    const currentFilms = this._getFilms().slice().sort(sortFilmsByComments).slice(0, EXTRA_FILMS_QUANTITY);
+    const currentFilms = this._getFilms().sort(sortFilmsByComments).slice(0, EXTRA_FILMS_QUANTITY);
 
     this._renderFilms(currentFilms, this._mostCommentedListContainerElement, this._filmPresentersMostCommented);
     renderElement(this._boardComponent, this._mostCommentedListComponent, 'beforeend');

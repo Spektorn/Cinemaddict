@@ -9,6 +9,12 @@ const Mode = {
   DETAILED: 'DETAILED',
 };
 
+const State = {
+  DISABLED: 'DISABLED',
+  DELETING: 'DELETING',
+  ERROR: 'ERROR',
+};
+
 export default class Film {
   constructor(filmsListContainer, changeData, changeMode, filmsModel, commentsModel, filterModel, api) {
     this._filmsListContainer = filmsListContainer;
@@ -28,7 +34,6 @@ export default class Film {
     this._handleAddToWatchlist = this._handleAddToWatchlist.bind(this);
     this._handleAddToWatched = this._handleAddToWatched.bind(this);
     this._handleAddToFavorite = this._handleAddToFavorite.bind(this);
-    //! Переделать под серверные данные
     this._handleCommentAdd = this._handleCommentAdd.bind(this);
     this._handleCommentDelete = this._handleCommentDelete.bind(this);
 
@@ -110,6 +115,27 @@ export default class Film {
     });
   }
 
+  _setViewState(state, commentID = null) {
+    switch (state) {
+      case State.DISABLED:
+        this._filmDetailedComponent.updateState({
+          isDisabled: true,
+        });
+        break;
+      case State.DELETING:
+        this._filmDetailedComponent.updateState({
+          deletingCommentID: commentID,
+        });
+        break;
+      case State.ERROR:
+        this._filmDetailedComponent.updateState({
+          isDisabled: false,
+        });
+        this._filmDetailedComponent.setShakeAnimation();
+        break;
+    }
+  }
+
   _openDetailedCard() {
     this._changeMode();
 
@@ -166,41 +192,60 @@ export default class Film {
     );
   }
 
-  //! Переделать под серверные данные
   _handleCommentAdd(film) {
-    this._changeData(
-      UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
-      film,
-    );
+    this._setViewState(State.DISABLED);
 
-    this._filmDetailedComponent.updateState({
-      comments: film.values().next().value,
-      newCommentText: null,
-      newCommentEmotion: null,
-    });
+    this._api.addComment(
+      film.id,
+      film.newComment,
+    )
+      .then((response) => {
+        this._changeData(
+          UserAction.ADD_COMMENT,
+          UpdateType.COMMENT,
+          response.comments,
+        );
 
-    this._film = film.keys().next().value;
-    this._comments = film.values().next().value;
+        this._filmDetailedComponent.updateState({
+          comments: this._commentsModel.getCommentsIDs(),
+          detailedComments: this._commentsModel.getComments(),
+          newCommentText: null,
+          newCommentEmotion: null,
+          isDisabled: false,
+        });
 
-    this.init(this._film, this._comments);
+        this._film.comments = this._commentsModel.getCommentsIDs();
+
+        this.init(this._film);
+      })
+      .catch(() => {
+        this._setViewState(State.ERROR);
+      });
   }
 
-  _handleCommentDelete(film) {
-    this._changeData(
-      UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
-      film,
-    );
+  _handleCommentDelete(commentID) {
+    this._setViewState(State.DELETING, commentID);
 
-    this._filmDetailedComponent.updateState({
-      comments: film.values().next().value,
-    });
+    this._api.deleteComment(commentID)
+      .then(() => {
+        this._changeData(
+          UserAction.DELETE_COMMENT,
+          UpdateType.COMMENT,
+          commentID,
+        );
 
-    this._film = film.keys().next().value;
-    this._comments = film.values().next().value;
+        this._filmDetailedComponent.updateState({
+          comments: this._commentsModel.getCommentsIDs(),
+          detailedComments: this._commentsModel.getComments(),
+          deletingCommentID: null,
+        });
 
-    this.init(this._film, this._comments);
+        this._film.comments = this._commentsModel.getCommentsIDs();
+        this.init(this._film);
+      })
+      .catch(() => {
+        this._setViewState(State.ERROR);
+      });
   }
 
   _ctrlEnterKeyDownHandler(evt) {

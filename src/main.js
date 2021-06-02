@@ -2,10 +2,10 @@ import FilmsModel from './model/films.js';
 import CommentsModel from './model/comments.js';
 import FilterModel from './model/filter.js';
 
+import ProfilePresenter from './presenter/profile.js';
 import FilmsBoardPresenter from './presenter/films-board.js';
 import FilterPresenter from './presenter/filter.js';
 
-import ProfileView from './view/profile.js';
 import FooterStatisticsView from './view/footer-statistics.js';
 
 import {UpdateType} from './utilities/constants.js';
@@ -27,14 +27,14 @@ const filmsModel = new FilmsModel();
 const commentsModel = new CommentsModel();
 const filterModel = new FilterModel();
 
+const profilePresenter = new ProfilePresenter(siteHeaderElement, filmsModel);
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel);
 const filmsBoardPresenter = new FilmsBoardPresenter(siteMainElement, filmsModel, commentsModel, filterModel, api);
-
-renderElement(siteHeaderElement, new ProfileView(11), 'beforeend');
 
 api.getFilms()
   .then((films) => {
     filmsModel.setFilms(UpdateType.INIT, films);
+    profilePresenter.init();
     filterPresenter.init();
     renderElement(footerStatisticsElement, new FooterStatisticsView(filmsModel.getFilms().length), 'beforeend');
   })

@@ -1,9 +1,11 @@
-import {nanoid} from 'nanoid';
 import he from 'he';
 
 import SmartView from './smart.js';
 
-import {getTodayDate, dateFormatReleaseDetailed, dateFormatComment, runtimeAdapter} from '../utilities/date.js';
+import {dateFormatReleaseDetailed, dateFormatComment, runtimeAdapter} from '../utilities/date.js';
+
+const ANIMATION_DURATION = 0.8;
+const ANIMATION_TIMEOUT = 600;
 
 const renderGenres = (genres) => {
   const genresTitle = genres.length > 1 ? 'Genres' : 'Genre';
@@ -25,7 +27,11 @@ const renderCheckedState = (flag) => {
   return flag ? 'checked' : '';
 };
 
-const renderComments = (comments) => {
+const renderComments = (comments, deletingCommentID) => {
+  const isDeleting = (commentID) => {
+    return (commentID === deletingCommentID);
+  };
+
   if (!comments) {
     return;
   }
@@ -33,7 +39,7 @@ const renderComments = (comments) => {
   let commentsList = '';
 
   for (const comment of comments) {
-    commentsList += `<li class="film-details__comment">
+    commentsList += `<li class="film-details__comment" id="comment-${comment.id}">
                   <span class="film-details__comment-emoji">
                     <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
                   </span>
@@ -42,7 +48,7 @@ const renderComments = (comments) => {
                     <p class="film-details__comment-info">
                       <span class="film-details__comment-author">${comment.author}</span>
                       <span class="film-details__comment-day">${dateFormatComment(comment.date)}</span>
-                      <button class="film-details__comment-delete" data-comment-id="${comment.id}">Delete</button>
+                      <button class="film-details__comment-delete" data-comment-id="${comment.id}" ${isDeleting(comment.id) ? 'disabled' : ''}>${isDeleting(comment.id) ? 'Deleting...' : 'Delete'}</button>
                     </p>
                   </div>
                 </li>`;
@@ -53,12 +59,12 @@ const renderComments = (comments) => {
           </ul>`;
 };
 
-const renderNewCommentText = (text) => {
+const renderNewCommentText = (text, isDisabled) => {
   if (!text) {
     return '<textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>';
   }
 
-  return `<textarea class="film-details__comment-input" name="comment">${text}</textarea>`;
+  return `<textarea class="film-details__comment-input" name="comment" ${isDisabled ? 'disabled' : ''}>${text}</textarea>`;
 };
 
 const renderNewCommentEmotion = (emotion) => {
@@ -88,10 +94,11 @@ const renderEmotionsList = (currentEmotion) => {
   }).join('');
 };
 
-const createDetailedCardTemplate = (film, detailedComments) => {
+const createDetailedCardTemplate = (film) => {
   const {poster, title, originalTitle, description, rating, ageRating, country,
     releaseDate, runningTime, genres, director, scriptwriters, actors,
-    isInWatchlist, isWatched, isFavorite, comments, newCommentText, newCommentEmotion} = film;
+    isInWatchlist, isWatched, isFavorite, comments, detailedComments,
+    newCommentText, newCommentEmotion, isDisabled, deletingCommentID} = film;
 
   return `<section class="film-details">
             <form class="film-details__inner" action="" method="get">
@@ -165,11 +172,11 @@ const createDetailedCardTemplate = (film, detailedComments) => {
               <div class="film-details__bottom-container">
                 <section class="film-details__comments-wrap">
                   <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
-                  ${renderComments(detailedComments)}
+                  ${renderComments(detailedComments, deletingCommentID)}
                   <div class="film-details__new-comment">
                     ${renderNewCommentEmotion(newCommentEmotion)}
                     <label class="film-details__comment-label">
-                      ${renderNewCommentText(newCommentText)}
+                      ${renderNewCommentText(newCommentText, isDisabled)}
                     </label>
 
                     <div class="film-details__emoji-list">
@@ -189,8 +196,7 @@ export default class DetailedCard extends SmartView {
     this._prevNewCommentText = null;
     this._prevNewCommentEmotion = null;
 
-    this._state = DetailedCard.parseDataToState(film);
-    this._detailedComments = detailedComments;
+    this._state = DetailedCard.parseDataToState(film, detailedComments);
 
     this._toBriefClickHandler = this._toBriefClickHandler.bind(this);
     this._toWatchlistCheckHandler = this._toWatchlistCheckHandler.bind(this);
@@ -224,7 +230,6 @@ export default class DetailedCard extends SmartView {
     this._callback.toFavoriteCheck();
   }
 
-  //! Переделать для серверных данных
   _commentAddHandler() {
     if (this._state.newCommentText && this._state.newCommentEmotion) {
       this._callback.addCommentKeyDown(
@@ -239,10 +244,7 @@ export default class DetailedCard extends SmartView {
     const deleteButton = evt.target.closest('.film-details__comment-delete');
 
     if (deleteButton) {
-      this._state.comments.splice(this._state.comments.findIndex((comment) => comment.id === deleteButton.dataset.commentId), 1);
-      this._callback.deleteCommentClick(
-        DetailedCard.parseStateToData(this._state, {isNewCommentSaving: true, isNewCommentAdding: false}),
-      );
+      this._callback.deleteCommentClick(deleteButton.dataset.commentId);
     }
   }
 
@@ -300,7 +302,6 @@ export default class DetailedCard extends SmartView {
     this.getElement().querySelector('input#favorite').addEventListener('change', this._toFavoriteCheckHandler);
   }
 
-  //! Переделать для серверных данных
   setСommentDeleteHandler(callback) {
     this._callback.deleteCommentClick = callback;
 
@@ -313,39 +314,56 @@ export default class DetailedCard extends SmartView {
     this._commentAddHandler();
   }
 
-  getTemplate() {
-    return createDetailedCardTemplate(this._state, this._detailedComments);
+  setShakeAnimation() {
+    const shakingElement = this._state.deletingCommentID ?
+      this.getElement().querySelector(`#comment-${this._state.deletingCommentID}`) :
+      this.getElement().querySelector('.film-details__new-comment');
+
+    shakingElement.style.animation = `shake ${ANIMATION_DURATION}s`;
+    setTimeout(() => {
+      shakingElement.style.animation = '';
+      this.updateState({
+        deletingCommentID: null,
+      });
+    },
+    ANIMATION_TIMEOUT);
   }
 
-  static parseDataToState(data) {
+  getTemplate() {
+    return createDetailedCardTemplate(this._state);
+  }
+
+  static parseDataToState(data, detailedComments) {
     return Object.assign(
       {},
       data,
       {
+        detailedComments,
         newCommentText: this._prevNewCommentText,
         newCommentEmotion: this._prevNewCommentEmotion,
+        isDisabled: false,
+        deletingCommentID: null,
       },
     );
   }
 
-  //! Переделать для серверных данных
   static parseStateToData(state, {isNewCommentSaving, isNewCommentAdding} = {}) {
     state = Object.assign({}, state);
     this._prevNewCommentText = isNewCommentSaving ? state.newCommentText : null;
     this._prevNewCommentEmotion = isNewCommentSaving ? state.newCommentEmotion : null;
 
     if(isNewCommentAdding) {
-      state.comments.push({
-        id: nanoid(),
-        author: 'Username',
-        date: getTodayDate(),
-        text: state.newCommentText,
+      state.newComment = {
+        comment: state.newCommentText,
         emotion: state.newCommentEmotion,
-      });
+      };
     }
 
+    delete state.detailedComments;
     delete state.newCommentText;
     delete state.newCommentEmotion;
+    delete state.isDisabled;
+    delete state.deletingCommentID;
 
     return state;
   }

@@ -25,3 +25,23 @@ export const getSlicedDataFromMap = (map, startIndex, endIndex) => {
   return Array.from(map.keys()).slice(startIndex, endIndex)
     .reduce((slicedMap, key) => slicedMap.set(key, map.get(key)), new Map);
 };
+
+export const getUserRank = (watchedFilmsQuantity) => {
+  const rankToQuantityBarrier = {
+    'Novice': 1,
+    'Fan': 11,
+    'Movie Buff': 21,
+  };
+
+  let currentRank;
+
+  for (const [rankName, quantityBarrier] of Object.entries(rankToQuantityBarrier)) {
+    if(watchedFilmsQuantity >= quantityBarrier) {
+      currentRank = rankName;
+    }
+  }
+
+  currentRank = watchedFilmsQuantity ? currentRank : '';
+
+  return currentRank;
+};
