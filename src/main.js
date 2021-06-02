@@ -1,3 +1,5 @@
+import Api from './api.js';
+
 import FilmsModel from './model/films.js';
 import CommentsModel from './model/comments.js';
 import FilterModel from './model/filter.js';
@@ -10,8 +12,6 @@ import FooterStatisticsView from './view/footer-statistics.js';
 
 import {UpdateType} from './utilities/constants.js';
 import {renderElement} from './utilities/render.js';
-
-import Api from './api.js';
 
 const AUTHORIZATION = 'Basic leviathan66';
 const END_POINT = 'https://14.ecmascript.pages.academy/cinemaddict';

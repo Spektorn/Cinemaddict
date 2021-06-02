@@ -241,6 +241,7 @@ export default class Film {
         });
 
         this._film.comments = this._commentsModel.getCommentsIDs();
+
         this.init(this._film);
       })
       .catch(() => {
@@ -265,14 +266,14 @@ export default class Film {
     }
   }
 
-  destroyInstance() {
-    removeComponent(this._filmBriefComponent);
-    removeComponent(this._filmDetailedComponent);
-  }
-
   resetView() {
     if (this._mode !== Mode.BRIEF) {
       this._closeDetailedCard();
     }
+  }
+
+  destroyInstance() {
+    removeComponent(this._filmBriefComponent);
+    removeComponent(this._filmDetailedComponent);
   }
 }

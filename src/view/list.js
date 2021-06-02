@@ -33,10 +33,10 @@ export default class List extends AbstractView {
   constructor(listType) {
     super();
 
-    this.listType = listType;
+    this._listType = listType;
   }
 
   getTemplate() {
-    return createListTemplate(this.listType);
+    return createListTemplate(this._listType);
   }
 }

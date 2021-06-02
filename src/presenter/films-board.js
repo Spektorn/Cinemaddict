@@ -1,10 +1,10 @@
+import FilmPresenter from './film.js';
+
 import BoardView from '../view/board.js';
 import StatisticsView from '../view/statistics.js';
 import ListView from '../view/list';
 import SortView from '../view/sort.js';
 import ShowMoreButtonView from '../view/show-more-button.js';
-
-import FilmPresenter from './film.js';
 
 import {FilterType, SortType, ListType, UserAction, UpdateType} from '../utilities/constants.js';
 import {getUserRank} from '../utilities/common.js';
@@ -132,7 +132,6 @@ export default class FilmsBoard {
         this._isLoading = false;
 
         removeComponent(this._loadingListComponent);
-
         this._renderFilmsBoard();
         break;
     }

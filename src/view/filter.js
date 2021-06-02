@@ -1,10 +1,16 @@
 import AbstractView from './abstract.js';
 
+import {FilterType} from '../utilities/constants.js';
+
 const renderFilters = (filters, activeFilter) => {
-  return filters.map(({id, title, quantity} = {}) =>
-    `<a href="#${id}" class="main-navigation__item ${id === activeFilter ? 'main-navigation__item--active' : ''}"
-    data-filter-type="${id}">${title} ${id !== 'all' ? `<span class="main-navigation__item-count">${quantity}</span>` : ''}</a>`)
-    .join('');
+  let filtersList = '';
+
+  for (const filter of filters) {
+    filtersList += `<a href="#${filter.id}" class="main-navigation__item ${filter.id === activeFilter ? 'main-navigation__item--active' : ''}"
+    data-filter-type="${filter.id}">${filter.title} ${filter.id !== 'all' ? `<span class="main-navigation__item-count">${filter.quantity}</span>` : ''}</a>`;
+  }
+
+  return filtersList;
 };
 
 const createFilterTemplate = (filters, activeFilter) => {
@@ -14,7 +20,7 @@ const createFilterTemplate = (filters, activeFilter) => {
               ${renderFilters(filters, activeFilter)}
 
             </div>
-            <a href="#stats" class="main-navigation__additional" data-filter-type="stats">Stats</a>
+            <a href="#stats" class="main-navigation__additional ${FilterType.STATISTICS === activeFilter ? 'main-navigation__additional--active' : ''}" data-filter-type="stats">Stats</a>
           </nav>`;
 };
 

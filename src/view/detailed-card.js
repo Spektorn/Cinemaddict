@@ -48,7 +48,9 @@ const renderComments = (comments, deletingCommentID) => {
                     <p class="film-details__comment-info">
                       <span class="film-details__comment-author">${comment.author}</span>
                       <span class="film-details__comment-day">${dateFormatComment(comment.date)}</span>
-                      <button class="film-details__comment-delete" data-comment-id="${comment.id}" ${isDeleting(comment.id) ? 'disabled' : ''}>${isDeleting(comment.id) ? 'Deleting...' : 'Delete'}</button>
+                      <button class="film-details__comment-delete" data-comment-id="${comment.id}" ${isDeleting(comment.id) ? 'disabled' : ''}>
+                        ${isDeleting(comment.id) ? 'Deleting...' : 'Delete'}
+                      </button>
                     </p>
                   </div>
                 </li>`;
@@ -87,10 +89,10 @@ const renderEmotionsList = (currentEmotion) => {
 
   return availableEmotions.map((emotion) => {
     return `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}"
-    value="${emotion}" ${currentEmotion === emotion ? 'checked' : ''}>
-    <label class="film-details__emoji-label" for="emoji-${emotion}">
-      <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji">
-    </label>`;
+            value="${emotion}" ${currentEmotion === emotion ? 'checked' : ''}>
+            <label class="film-details__emoji-label" for="emoji-${emotion}">
+              <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji">
+            </label>`;
   }).join('');
 };
 
@@ -265,8 +267,8 @@ export default class DetailedCard extends SmartView {
   }
 
   _setInnerHandlers() {
-    this.getElement().querySelector('.film-details__emoji-list').addEventListener('change', this._commentEmotionChangeHandler);
     this.getElement().querySelector('.film-details__comment-input').addEventListener('change', this._commentTextChangeHandler);
+    this.getElement().querySelector('.film-details__emoji-list').addEventListener('change', this._commentEmotionChangeHandler);
   }
 
   restoreHandlers() {
@@ -320,6 +322,7 @@ export default class DetailedCard extends SmartView {
       this.getElement().querySelector('.film-details__new-comment');
 
     shakingElement.style.animation = `shake ${ANIMATION_DURATION}s`;
+
     setTimeout(() => {
       shakingElement.style.animation = '';
       this.updateState({

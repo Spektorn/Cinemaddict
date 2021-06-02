@@ -1,4 +1,5 @@
 import AbstractView from './abstract.js';
+
 import {SortType} from '../utilities/constants.js';
 
 const createSortTemplate = (currentSortType) => {

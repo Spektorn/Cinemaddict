@@ -116,19 +116,24 @@ const createStatisticsTemplate = ({currentFilms, currentStatisticsFilterType} = 
             <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
               <p class="statistic__filters-description">Show stats:</p>
 
-              <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="all-time" ${currentStatisticsFilterType === StatisticsFilterType.ALL_TIME ? 'checked' : ''}>
+              <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="all-time"
+              ${currentStatisticsFilterType === StatisticsFilterType.ALL_TIME ? 'checked' : ''}>
               <label for="statistic-all-time" class="statistic__filters-label">All time</label>
 
-              <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="today" ${currentStatisticsFilterType === StatisticsFilterType.TODAY ? 'checked' : ''}>
+              <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="today"
+              ${currentStatisticsFilterType === StatisticsFilterType.TODAY ? 'checked' : ''}>
               <label for="statistic-today" class="statistic__filters-label">Today</label>
 
-              <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="week" ${currentStatisticsFilterType === StatisticsFilterType.WEEK ? 'checked' : ''}>
+              <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="week"
+              ${currentStatisticsFilterType === StatisticsFilterType.WEEK ? 'checked' : ''}>
               <label for="statistic-week" class="statistic__filters-label">Week</label>
 
-              <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="month" ${currentStatisticsFilterType === StatisticsFilterType.MONTH ? 'checked' : ''}>
+              <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="month"
+              ${currentStatisticsFilterType === StatisticsFilterType.MONTH ? 'checked' : ''}>
               <label for="statistic-month" class="statistic__filters-label">Month</label>
 
-              <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="year" ${currentStatisticsFilterType === StatisticsFilterType.YEAR ? 'checked' : ''}>
+              <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="year"
+              ${currentStatisticsFilterType === StatisticsFilterType.YEAR ? 'checked' : ''}>
               <label for="statistic-year" class="statistic__filters-label">Year</label>
             </form>
 
@@ -188,7 +193,7 @@ export default class Statistics extends SmartView {
     const currentStatisticsFilterType = evt.target.value;
 
     const currentFilms = currentStatisticsFilterType !== StatisticsFilterType.ALL_TIME
-      ? this._watchedFilms.slice().filter((film) => dayjs(film.watchedDate) >= dayjs().subtract(1, currentStatisticsFilterType).toDate())
+      ? this._watchedFilms.filter((film) => dayjs(film.watchedDate) >= dayjs().subtract(1, currentStatisticsFilterType).toDate())
       : this._watchedFilms.slice();
 
     this.updateState({

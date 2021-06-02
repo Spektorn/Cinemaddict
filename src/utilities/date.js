@@ -3,10 +3,6 @@ import duration from 'dayjs/plugin/duration';
 
 dayjs.extend(duration);
 
-export const getTodayDate = () => {
-  return dayjs();
-};
-
 export const dateFormatReleaseBrief = (date) => {
   return dayjs(date).format('YYYY');
 };
